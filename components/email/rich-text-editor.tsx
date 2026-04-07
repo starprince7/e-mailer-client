@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import 'quill/dist/quill.snow.css';
 
 interface RichTextEditorProps {
   value: string;
@@ -26,7 +27,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
 
     const initQuill = async () => {
       const Quill = (await import('quill')).default;
-      await import('quill/dist/quill.snow.css');
 
       if (!containerRef.current) return;
       if (quillInstanceRef.current) return;
