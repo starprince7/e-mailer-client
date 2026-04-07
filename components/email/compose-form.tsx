@@ -59,14 +59,30 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const apiKey = localStorage.getItem('resend_api_key');
-    if (!apiKey) {
-      toast({
-        title: 'API Key Required',
-        description: 'Please configure your Resend API key in Settings first.',
-        variant: 'destructive',
-      });
-      return;
+    // Check if environment variable API key is available first
+    let apiKey: string | null = null;
+    try {
+      const response = await fetch('/api/check-env-key');
+      const data = await response.json();
+      if (data.hasEnvKey) {
+        // Server has env var configured, we don't need to send API key from client
+        apiKey = null; // Server will use process.env.RESEND_API_KEY
+      }
+    } catch (error) {
+      console.error('Failed to check environment key:', error);
+    }
+    
+    // If no env key, fall back to localStorage
+    if (apiKey === null) {
+      apiKey = localStorage.getItem('resend_api_key');
+      if (!apiKey) {
+        toast({
+          title: 'API Key Required',
+          description: 'Please configure your Resend API key in Settings first.',
+          variant: 'destructive',
+        });
+        return;
+      }
     }
     
     setIsLoading(true);
