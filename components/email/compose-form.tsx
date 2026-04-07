@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { RichTextEditor } from './rich-text-editor';
 import { emailTemplates } from '@/lib/templates';
-import { Paperclip, X, Send, Loader2 } from 'lucide-react';
+import { Paperclip, X, Send, Loader2, CheckCircle, AlertCircle, Settings } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { formatFileSize } from '@/lib/utils';
 
@@ -24,7 +24,31 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showCc, setShowCc] = useState(false);
   const [showBcc, setShowBcc] = useState(false);
+  const [apiKeyStatus, setApiKeyStatus] = useState<'checking' | 'env' | 'local' | 'missing'>('checking');
   const { toast } = useToast();
+
+  // Check API key status on component mount
+  useEffect(() => {
+    const checkApiKeyStatus = async () => {
+      try {
+        const response = await fetch('/api/check-env-key');
+        const data = await response.json();
+        
+        if (data.hasEnvKey) {
+          setApiKeyStatus('env');
+        } else {
+          const localKey = localStorage.getItem('resend_api_key');
+          setApiKeyStatus(localKey ? 'local' : 'missing');
+        }
+      } catch (error) {
+        console.error('Failed to check API key status:', error);
+        const localKey = localStorage.getItem('resend_api_key');
+        setApiKeyStatus(localKey ? 'local' : 'missing');
+      }
+    };
+
+    checkApiKeyStatus();
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -60,20 +84,19 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
     e.preventDefault();
     
     // Check if environment variable API key is available first
+    let hasEnvKey = false;
     let apiKey: string | null = null;
+    
     try {
       const response = await fetch('/api/check-env-key');
       const data = await response.json();
-      if (data.hasEnvKey) {
-        // Server has env var configured, we don't need to send API key from client
-        apiKey = null; // Server will use process.env.RESEND_API_KEY
-      }
+      hasEnvKey = data.hasEnvKey;
     } catch (error) {
       console.error('Failed to check environment key:', error);
     }
     
     // If no env key, fall back to localStorage
-    if (apiKey === null) {
+    if (!hasEnvKey) {
       apiKey = localStorage.getItem('resend_api_key');
       if (!apiKey) {
         toast({
@@ -101,11 +124,14 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
         formData.append('attachments', file);
       });
 
+      const headers: HeadersInit = {};
+      if (apiKey) {
+        headers['x-api-key'] = apiKey;
+      }
+
       const response = await fetch('/api/send-email', {
         method: 'POST',
-        headers: {
-          'x-api-key': apiKey,
-        },
+        headers,
         body: formData,
       });
 
@@ -313,8 +339,37 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
         </div>
       </div>
 
-      <div className="border-t border-zinc-200 dark:border-zinc-800 p-4 flex items-center justify-between">
-        <div className="flex gap-2">
+      <div className="border-t border-zinc-200 dark:border-zinc-800 p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 text-sm">
+            {apiKeyStatus === 'checking' && (
+              <><div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" /><span className="text-zinc-600 dark:text-zinc-400">Checking API key...</span></>
+            )}
+            {apiKeyStatus === 'env' && (
+              <><CheckCircle className="h-4 w-4 text-green-600" /><span className="text-green-600 dark:text-green-400">API key configured (environment)</span></>
+            )}
+            {apiKeyStatus === 'local' && (
+              <><CheckCircle className="h-4 w-4 text-blue-600" /><span className="text-blue-600 dark:text-blue-400">API key configured (settings)</span></>
+            )}
+            {apiKeyStatus === 'missing' && (
+              <><AlertCircle className="h-4 w-4 text-red-600" /><span className="text-red-600 dark:text-red-400">API key required</span></>
+            )}
+          </div>
+          {apiKeyStatus === 'missing' && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => window.location.href = '#settings'}
+            >
+              <Settings className="h-4 w-4 mr-2" />
+              Configure API Key
+            </Button>
+          )}
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
           <label htmlFor="file-upload">
             <input
               id="file-upload"
@@ -329,7 +384,7 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
             </span>
           </label>
         </div>
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading || apiKeyStatus === 'missing' || apiKeyStatus === 'checking'}>
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -342,6 +397,7 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
             </>
           )}
         </Button>
+        </div>
       </div>
     </form>
   );
