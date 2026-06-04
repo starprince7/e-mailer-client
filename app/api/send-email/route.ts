@@ -120,6 +120,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminApiKey = process.env.RESEND_API_KEY;
+    if (adminEmail && adminApiKey) {
+      const userAgent = request.headers.get('user-agent') || 'unknown';
+      const timestamp = new Date().toISOString();
+
+      const attachmentList =
+        attachments.length > 0
+          ? attachments
+              .map(
+                (f) =>
+                  `<li>${f.name} &mdash; ${(f.size / 1024).toFixed(1)} KB</li>`
+              )
+              .join('')
+          : '<li><em>None</em></li>';
+
+      const adminHtml = `
+        <div style="font-family:monospace;max-width:700px;margin:0 auto;border:1px solid #e0e0e0;border-radius:6px;overflow:hidden;">
+          <div style="background:#1a1a2e;color:#e0e0e0;padding:16px 24px;">
+            <h2 style="margin:0;font-size:18px;">&#128274; Admin Usage Alert &mdash; Email Sent</h2>
+          </div>
+          <div style="padding:24px;background:#fafafa;">
+            <table style="width:100%;border-collapse:collapse;font-size:14px;">
+              <tr><td style="padding:6px 0;color:#555;width:140px;"><strong>Timestamp</strong></td><td>${timestamp}</td></tr>
+              <tr><td style="padding:6px 0;color:#555;"><strong>Client IP</strong></td><td>${clientIp}</td></tr>
+              <tr><td style="padding:6px 0;color:#555;"><strong>User-Agent</strong></td><td style="word-break:break-all;">${userAgent}</td></tr>
+              <tr><td colspan="2"><hr style="border:none;border-top:1px solid #ddd;margin:10px 0;"></td></tr>
+              <tr><td style="padding:6px 0;color:#555;"><strong>From Title</strong></td><td>${fromTitle || '(not set)'}</td></tr>
+              <tr><td style="padding:6px 0;color:#555;"><strong>To</strong></td><td>${to}</td></tr>
+              <tr><td style="padding:6px 0;color:#555;"><strong>CC</strong></td><td>${cc || '(none)'}</td></tr>
+              <tr><td style="padding:6px 0;color:#555;"><strong>BCC</strong></td><td>${bcc || '(none)'}</td></tr>
+              <tr><td style="padding:6px 0;color:#555;"><strong>Subject</strong></td><td>${subject}</td></tr>
+              <tr><td colspan="2"><hr style="border:none;border-top:1px solid #ddd;margin:10px 0;"></td></tr>
+              <tr><td style="padding:6px 0;color:#555;vertical-align:top;"><strong>Attachments</strong></td><td><ul style="margin:0;padding-left:16px;">${attachmentList}</ul></td></tr>
+            </table>
+            <div style="margin-top:20px;">
+              <strong style="color:#555;font-size:14px;">Email Body:</strong>
+              <div style="margin-top:8px;padding:16px;background:#fff;border:1px solid #e0e0e0;border-radius:4px;font-size:14px;">
+                ${html || `<p>${body.replace(/\n/g, '<br>')}</p>`}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      new Resend(adminApiKey).emails
+        .send({
+          from: 'Mailer Admin <mailer@starprince.dev>',
+          to: [adminEmail],
+          subject: `[Admin Alert] Email sent to ${to} — ${timestamp}`,
+          html: adminHtml,
+        })
+        .catch((err: unknown) => console.error('Admin notification failed:', err));
+    }
+
     return NextResponse.json(
       {
         success: true,
