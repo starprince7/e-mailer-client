@@ -1,0 +1,652 @@
+import { EmailTemplate } from '../types';
+
+export interface PromoProductConfig {
+  productName: string;
+  tagline: string;
+  priceDisplay: string;
+  originalPriceDisplay?: string;
+  ctaUrl: string;
+  ctaText: string;
+  supportContact: string;
+  senderName: string;
+  urgencyText?: string;
+  limitedUnits?: number;
+  deadlineText?: string;
+  preheaderText?: string;
+  headerEyebrow?: string;
+  headline?: string;
+  subheadline?: string;
+  problemHeadline?: string;
+  problemBody1?: string;
+  problemBody2?: string;
+  painPoints?: string[];
+  solutionBody?: string;
+  productCapacityDescription?: string;
+  deliveryValue?: string;
+  bonus1Name?: string;
+  bonus1Description?: string;
+  bonus1Value?: string;
+  bonus2Name?: string;
+  bonus2Description?: string;
+  bonus2Value?: string;
+  guaranteeTitle?: string;
+  guaranteeBody?: string;
+  testimonials?: Array<{ quote: string; attribution: string }>;
+  ctaHeadline?: string;
+  ctaSubtext?: string;
+}
+
+export function generatePromoEmailHTML(config: PromoProductConfig): string {
+  const {
+    productName,
+    tagline,
+    priceDisplay,
+    originalPriceDisplay = '₦706,500+ if purchased separately',
+    ctaUrl,
+    ctaText,
+    supportContact,
+    senderName,
+    urgencyText = 'Only a few units left at this price',
+    limitedUnits,
+    deadlineText,
+    preheaderText = "The next blackout won't stop you — here's your permanent solution, with everything included.",
+    headerEyebrow = 'BLACKOUT-PROOF YOUR HOME &amp; BUSINESS',
+    headline = "What If The Next Power Outage<br>Didn't Disrupt A Single Minute<br>Of Your Life?",
+    subheadline = "Lights stay on. Laptops keep running. Router stays connected.<br>Business doesn't stop. Family stays comfortable.",
+    problemHeadline = 'NEPA takes light. You lose money. Again.',
+    problemBody1 = "Every time power goes out, the clock starts ticking. Your laptop battery drops. Your Zoom call cuts off mid-sentence. Your customer is left waiting. Your child can't study. And you're sitting there — staring at a generator you have to fuel, maintain, and tolerate the noise of — hoping it doesn't fail <em>again</em>.",
+    problemBody2 = `The average Nigerian professional loses <strong style="color:#DC2626;">4–8 hours of productive time</strong> every week to power interruptions. That's over <strong style="color:#DC2626;">25 full working days</strong> per year — gone.`,
+    painPoints = [
+      'Missed a client call because power went out at the worst time',
+      'Lost unsaved work when your laptop died suddenly',
+      'Spending ₦30,000+ monthly on fuel for a loud, smelly generator',
+      'Telling your family "just wait, power will come back soon" — for the fifth time this week',
+    ],
+    solutionBody = "Plug it in. Charge it from solar. And the next time NEPA takes light, you don't even notice. No fumes. No noise. No fuel runs. Just clean, silent power — available the moment you need it.",
+    productCapacityDescription = '768Wh capacity · Powers laptops, fans, routers, lights, TVs, and small appliances simultaneously',
+    deliveryValue = '₦8,000 FREE',
+    bonus1Name = 'Extended Warranty Cover',
+    bonus1Description = 'Extended manufacturer warranty included at no extra cost — full parts &amp; service coverage so you never have to worry about repair bills',
+    bonus1Value = '₦45,000 FREE',
+    bonus2Name = 'Free Solar Panel Installation',
+    bonus2Description = "Add a compatible solar panel to your order and we'll professionally install it for free — so the sun recharges your battery while NEPA is away. Fuel bills: ₦0.",
+    bonus2Value = '₦35,000 FREE',
+    guaranteeTitle = '100% Satisfaction Guarantee — No Time Limit',
+    guaranteeBody: guaranteeBodyRaw,
+    testimonials: testimonialsRaw,
+    ctaHeadline = 'Stop losing hours — and money — to power cuts',
+    ctaSubtext = 'The next blackout is coming. The only question is whether it disrupts you or not.',
+  } = config;
+
+  const guaranteeBody = guaranteeBodyRaw ?? `If the ${productName} doesn't keep your home or business running through every blackout exactly as promised, tell us and we'll make it right — full refund or replacement, no questions, no deadline. We're that confident this changes your daily life. The only risk you're taking is spending another month the way things are now.`;
+
+  const testimonials = testimonialsRaw ?? [
+    {
+      quote: "NEPA took light for 11 hours last Tuesday. My laptop, router, and ring light ran the whole time. I finished two client deliverables and nobody even knew there was an outage on my end.",
+      attribution: "Tunde A., Freelance Designer, Lagos",
+    },
+    {
+      quote: `I used to spend ₦40,000 a month on petrol for my generator. Since I got the ${productName} with the solar panel, that cost is almost zero. It paid for itself faster than I expected.`,
+      attribution: "Chidinma O., Small Business Owner, Abuja",
+    },
+  ];
+
+  return `
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>${productName} — Never Lose Power Again</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style type="text/css">
+    /* Reset */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+
+    /* Base */
+    body { margin: 0 !important; padding: 0 !important; background-color: #F0F4F8; width: 100% !important; }
+
+    /* Hover Effects for Modern Clients */
+    .cta-btn {
+      transition: all 0.22s ease-in-out !important;
+    }
+    .cta-btn:hover {
+      background-color: #EA580C !important;
+      border-color: #EA580C !important;
+      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.45) !important;
+      transform: translateY(-1px) scale(1.02) !important;
+    }
+
+    /* Mobile */
+    @media only screen and (max-width: 620px) {
+      .wrapper { width: 100% !important; padding: 0 !important; }
+      .container { width: 100% !important; }
+      .mobile-pad { padding-left: 20px !important; padding-right: 20px !important; }
+      .header-headline { font-size: 24px !important; line-height: 1.3 !important; }
+      .cta-btn-td { width: 100% !important; display: block !important; }
+      .cta-btn { 
+        width: 100% !important; 
+        font-size: 17px !important; 
+        padding: 16px 10px !important; 
+        display: block !important; 
+        border-left: 0 !important; 
+        border-right: 0 !important; 
+        box-sizing: border-box !important;
+      }
+      .value-label { font-size: 13px !important; }
+      .price-big { font-size: 32px !important; }
+      .bonus-tag { font-size: 11px !important; padding: 3px 8px !important; }
+      .two-col-td { display: block !important; width: 100% !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#F0F4F8;">
+
+  <!-- Preheader (hidden preview text) -->
+  <div style="display:none;font-size:1px;color:#F0F4F8;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+    ${preheaderText}
+  </div>
+
+  <!-- OUTER WRAPPER -->
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#F0F4F8;">
+    <tr>
+      <td align="center" style="padding: 24px 12px;">
+
+        <!-- MAIN CONTAINER -->
+        <table class="container" role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#FFFFFF; border-radius:12px; overflow:hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+
+          <!-- ===== URGENCY BANNER ===== -->
+          <tr>
+            <td style="background-color:#DC2626; padding: 10px 32px; text-align:center;">
+              <p style="margin:0; color:#FFFFFF; font-size:13px; font-weight:700; letter-spacing:0.5px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                ⚡ ${urgencyText}${limitedUnits ? ` — Only ${limitedUnits} units remaining` : ''}${deadlineText ? ` · Offer ends ${deadlineText}` : ''}
+              </p>
+            </td>
+          </tr>
+
+          <!-- ===== HEADER / DREAM OUTCOME ===== -->
+          <tr>
+            <td class="mobile-pad" style="background-color:#0C1A2E; padding: 48px 40px 40px; text-align:center;">
+              <!-- Eyebrow -->
+              <p style="margin:0 0 16px; color:#F97316; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                ${headerEyebrow}
+              </p>
+              <!-- Main Headline (Hormozi: lead with DREAM OUTCOME, not product name) -->
+              <h1 class="header-headline" style="margin:0 0 20px; color:#FFFFFF; font-size:30px; font-weight:800; line-height:1.25; letter-spacing:-0.5px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                ${headline}
+              </h1>
+              <p style="margin:0 0 24px; color:#94A3B8; font-size:16px; line-height:1.7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                ${subheadline}
+              </p>
+              <p style="margin:0; color:#F97316; font-size:18px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                Hi {{firstName}}, this is for you 👇
+              </p>
+            </td>
+          </tr>
+
+          <!-- ===== PROBLEM AGITATION (PAS) ===== -->
+          <tr>
+            <td class="mobile-pad" style="padding: 40px 40px 32px; background-color:#FFFFFF;">
+              <h2 style="margin:0 0 16px; color:#111827; font-size:20px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                ${problemHeadline}
+              </h2>
+              <p style="margin:0 0 20px; color:#4B5563; font-size:15px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                ${problemBody1}
+              </p>
+              <p style="margin:0 0 20px; color:#4B5563; font-size:15px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                ${problemBody2}
+              </p>
+              <!-- Pain bullet list -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#FEF2F2; border-radius:8px; border-left:4px solid #DC2626;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <p style="margin:0 0 10px; color:#991B1B; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">Sound familiar?</p>
+                    ${painPoints.map((point, i) => `<p style="margin:0${i < painPoints.length - 1 ? ' 0 8px' : ''}; color:#374151; font-size:14px; line-height:1.7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">✗ &nbsp;${point}</p>`).join('\n                    ')}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ===== SOLUTION BRIDGE ===== -->
+          <tr>
+            <td class="mobile-pad" style="padding: 32px 40px; background-color:#F8FAFC; text-align:center;">
+              <p style="margin:0 0 8px; color:#F97316; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">THE SOLUTION</p>
+              <h2 style="margin:0 0 12px; color:#0C1A2E; font-size:26px; font-weight:800; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                Meet the ${productName}
+              </h2>
+              <p style="margin:0 0 16px; color:#6B7280; font-size:15px; font-style:italic; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${tagline}</p>
+              <p style="margin:0 auto; max-width:460px; color:#374151; font-size:15px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                ${solutionBody}
+              </p>
+            </td>
+          </tr>
+
+          <!-- ===== VALUE STACK (Hormozi: name everything, show perceived value) ===== -->
+          <tr>
+            <td class="mobile-pad" style="padding: 40px 40px 32px; background-color:#FFFFFF;">
+              <p style="margin:0 0 6px; color:#F97316; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; text-align:center; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">EVERYTHING INCLUDED TODAY</p>
+              <h2 style="margin:0 0 28px; color:#0C1A2E; font-size:22px; font-weight:800; text-align:center; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                Your Complete Blackout-Proof Package
+              </h2>
+
+              <!-- Stack Item 1 — Core Product -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:1px solid #E5E7EB; border-radius:8px; overflow:hidden;">
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="32" valign="top" style="padding-top:2px;">
+                          <span style="color:#F97316; font-size:20px; font-weight:800;">✓</span>
+                        </td>
+                        <td>
+                          <p style="margin:0 0 2px; color:#111827; font-size:15px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            ${productName} ${tagline}
+                          </p>
+                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            ${productCapacityDescription}
+                          </p>
+                        </td>
+                        <td width="90" align="right" valign="top">
+                          <span class="value-label" style="background-color:#DCFCE7; color:#15803D; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">Core Item</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Stack Item 2 — Free Nationwide Delivery -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:1px solid #E5E7EB; border-radius:8px;">
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="32" valign="top" style="padding-top:2px;">
+                          <span style="color:#F97316; font-size:20px; font-weight:800;">✓</span>
+                        </td>
+                        <td>
+                          <p style="margin:0 0 2px; color:#111827; font-size:15px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            Free Nationwide Delivery
+                          </p>
+                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            Delivered to your door anywhere in Nigeria — tracked and insured
+                          </p>
+                        </td>
+                        <td width="90" align="right" valign="top">
+                          <span class="value-label" style="background-color:#FEF3C7; color:#92400E; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${deliveryValue}</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Stack Item 3 — Extended Warranty (Bonus) -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:2px solid #F97316; border-radius:8px; background-color:#FFF7ED;">
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="32" valign="top" style="padding-top:2px;">
+                          <span style="color:#F97316; font-size:20px;">🎁</span>
+                        </td>
+                        <td>
+                          <p style="margin:0 0 2px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            <span style="color:#111827; font-size:15px; font-weight:700;">BONUS #1: ${bonus1Name}</span>
+                            <span class="bonus-tag" style="background-color:#F97316; color:#FFFFFF; font-size:12px; font-weight:700; padding:3px 10px; border-radius:20px; margin-left:8px; white-space:nowrap;">BONUS</span>
+                          </p>
+                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            ${bonus1Description}
+                          </p>
+                        </td>
+                        <td width="90" align="right" valign="top">
+                          <span class="value-label" style="background-color:#FEF3C7; color:#92400E; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${bonus1Value}</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Stack Item 4 — Free Solar Panel Installation (Bonus) -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:2px solid #F97316; border-radius:8px; background-color:#FFF7ED;">
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="32" valign="top" style="padding-top:2px;">
+                          <span style="color:#F97316; font-size:20px;">🎁</span>
+                        </td>
+                        <td>
+                          <p style="margin:0 0 2px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            <span style="color:#111827; font-size:15px; font-weight:700;">BONUS #2: ${bonus2Name}</span>
+                            <span class="bonus-tag" style="background-color:#F97316; color:#FFFFFF; font-size:12px; font-weight:700; padding:3px 10px; border-radius:20px; margin-left:8px; white-space:nowrap;">BONUS</span>
+                          </p>
+                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            ${bonus2Description}
+                          </p>
+                        </td>
+                        <td width="90" align="right" valign="top">
+                          <span class="value-label" style="background-color:#FEF3C7; color:#92400E; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${bonus2Value}</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Stack Item 5 — Priority WhatsApp Support -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:1px solid #E5E7EB; border-radius:8px;">
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="32" valign="top" style="padding-top:2px;">
+                          <span style="color:#F97316; font-size:20px; font-weight:800;">✓</span>
+                        </td>
+                        <td>
+                          <p style="margin:0 0 2px; color:#111827; font-size:15px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            Priority WhatsApp Support
+                          </p>
+                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            Direct line to our technical team — any question, any time, answered fast
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Stack Item 6 — Blackout Survival Guide -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #E5E7EB; border-radius:8px;">
+                <tr>
+                  <td style="padding:16px 20px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="32" valign="top" style="padding-top:2px;">
+                          <span style="color:#F97316; font-size:20px; font-weight:800;">✓</span>
+                        </td>
+                        <td>
+                          <p style="margin:0 0 2px; color:#111827; font-size:15px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            "The Blackout Survival Guide" (Digital PDF)
+                          </p>
+                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                            Device compatibility chart, optimised power load schedule, and a step-by-step setup guide to maximise your battery life from day one
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Total Value Summary -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top:24px; background-color:#F8FAFC; border-radius:8px; border:1px dashed #CBD5E1;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td>
+                          <p style="margin:0 0 4px; color:#6B7280; font-size:13px; font-weight:600; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; text-transform:uppercase; letter-spacing:0.5px;">Total Package Value</p>
+                          <p style="margin:0; color:#9CA3AF; font-size:13px; text-decoration:line-through; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${originalPriceDisplay}</p>
+                        </td>
+                        <td align="right">
+                          <p style="margin:0 0 2px; color:#6B7280; font-size:12px; font-weight:600; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; text-align:right;">Your Price Today</p>
+                          <p class="price-big" style="margin:0; color:#0C1A2E; font-size:36px; font-weight:800; line-height:1; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; text-align:right;">${priceDisplay}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- ===== GUARANTEE (Hormozi: Risk Reversal) ===== -->
+          <tr>
+            <td class="mobile-pad" style="padding: 32px 40px; background-color:#F0FDF4;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td width="48" valign="top">
+                    <span style="font-size:36px; line-height:1;">🛡️</span>
+                  </td>
+                  <td style="padding-left:16px;">
+                    <p style="margin:0 0 6px; color:#15803D; font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">OUR PROMISE TO YOU</p>
+                    <p style="margin:0 0 8px; color:#14532D; font-size:17px; font-weight:800; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${guaranteeTitle}</p>
+                    <p style="margin:0; color:#374151; font-size:14px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                      ${guaranteeBody}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ===== SOCIAL PROOF ===== -->
+          <tr>
+            <td class="mobile-pad" style="padding: 32px 40px; background-color:#FFFFFF;">
+              <p style="margin:0 0 20px; color:#F97316; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; text-align:center; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">WHAT OTHERS ARE SAYING</p>
+
+              ${testimonials.map((t, i) => `<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="${i < testimonials.length - 1 ? 'margin-bottom:16px; ' : ''}background-color:#F8FAFC; border-radius:8px; border-left:4px solid #F97316;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <p style="margin:0 0 10px; color:#111827; font-size:14px; font-style:italic; line-height:1.7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                      "${t.quote}"
+                    </p>
+                    <p style="margin:0; color:#6B7280; font-size:13px; font-weight:600; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">— ${t.attribution}</p>
+                  </td>
+                </tr>
+              </table>`).join('\n              ')}
+            </td>
+          </tr>
+
+          <!-- ===== SCARCITY + CTA ===== -->
+          <tr>
+            <td class="mobile-pad" style="padding: 40px 40px 48px; background-color:#0C1A2E; text-align:center;">
+              <!-- Scarcity -->
+              ${limitedUnits ? `
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto 28px; background-color:#DC2626; border-radius:8px;">
+                <tr>
+                  <td style="padding:12px 24px;">
+                    <p style="margin:0; color:#FFFFFF; font-size:14px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                      🔴 &nbsp;WARNING: Only ${limitedUnits} units available at this offer price
+                    </p>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+
+              <h2 style="margin:0 0 12px; color:#FFFFFF; font-size:22px; font-weight:800; line-height:1.3; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                ${ctaHeadline}
+              </h2>
+              <p style="margin:0 0 28px; color:#94A3B8; font-size:15px; line-height:1.7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                ${ctaSubtext}
+              </p>
+
+              <!-- CTA Button -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
+                <tr>
+                  <td align="center" class="cta-btn-td" style="border-radius:8px; background-color:#F97316; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4); text-align:center;">
+                    <a href="${ctaUrl}" class="cta-btn" style="background-color:#F97316; border-top:16px solid #F97316; border-bottom:16px solid #F97316; border-left:36px solid #F97316; border-right:36px solid #F97316; color:#FFFFFF; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:18px; font-weight:800; text-decoration:none; border-radius:8px; display:inline-block; letter-spacing:0.5px; text-transform:uppercase; text-align:center; line-height:1;">
+                      ${ctaText} &nbsp;➔
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0; color:#64748B; font-size:13px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                ✓ Satisfaction guaranteed &nbsp;·&nbsp; ✓ Bonuses included &nbsp;·&nbsp; ✓ Free delivery
+              </p>
+            </td>
+          </tr>
+
+          <!-- ===== FINAL CLOSE ===== -->
+          <tr>
+            <td class="mobile-pad" style="padding: 32px 40px; background-color:#FFFFFF; text-align:center; border-top:1px solid #E5E7EB;">
+              <p style="margin:0 0 16px; color:#374151; font-size:15px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                Here's the truth, {{firstName}}: the ${productName} won't stop power outages from happening. But it will make them completely irrelevant to your life. That's the goal.
+              </p>
+              <p style="margin:0; color:#374151; font-size:15px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                — ${senderName}
+              </p>
+            </td>
+          </tr>
+
+          <!-- ===== FOOTER ===== -->
+          <tr>
+            <td style="padding: 24px 32px; background-color:#F8FAFC; border-top:1px solid #E5E7EB; text-align:center;">
+              <p style="margin:0 0 8px; color:#6B7280; font-size:13px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                Questions? Reach us via ${supportContact}
+              </p>
+              <p style="margin:0; color:#9CA3AF; font-size:12px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                You're receiving this because you signed up for updates from ${senderName}.<br>
+                <a href="#" style="color:#9CA3AF; text-decoration:underline;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+        <!-- END MAIN CONTAINER -->
+
+      </td>
+    </tr>
+  </table>
+  <!-- END OUTER WRAPPER -->
+
+</body>
+</html>
+  `.trim();
+}
+
+export const ecoflowRiver2ProConfig: PromoProductConfig = {
+  productName: 'EcoFlow RIVER 2 Pro',
+  tagline: 'Portable Power Station',
+  priceDisplay: '₦618,500',
+  originalPriceDisplay: '₦706,500+ if purchased separately',
+  ctaUrl: 'https://vissmingles.com/redirect?destination=stores.starprince.dev',
+  ctaText: 'Secure My Blackout-Proof Package',
+  supportContact: 'WhatsApp support',
+  senderName: 'Prince',
+  urgencyText: 'This offer — including the free bonuses — closes once stock runs out',
+  limitedUnits: 10,
+  deadlineText: 'Sunday midnight',
+  preheaderText: "The next blackout won't stop you — here's your permanent solution, with everything included.",
+  headerEyebrow: 'BLACKOUT-PROOF YOUR HOME &amp; BUSINESS',
+  headline: "What If The Next Power Outage<br>Didn't Disrupt A Single Minute<br>Of Your Life?",
+  subheadline: "Lights stay on. Laptops keep running. Router stays connected.<br>Business doesn't stop. Family stays comfortable.",
+  problemHeadline: 'NEPA takes light. You lose money. Again.',
+  problemBody1: "Every time power goes out, the clock starts ticking. Your laptop battery drops. Your Zoom call cuts off mid-sentence. Your customer is left waiting. Your child can't study. And you're sitting there — staring at a generator you have to fuel, maintain, and tolerate the noise of — hoping it doesn't fail <em>again</em>.",
+  problemBody2: `The average Nigerian professional loses <strong style="color:#DC2626;">4–8 hours of productive time</strong> every week to power interruptions. That's over <strong style="color:#DC2626;">25 full working days</strong> per year — gone.`,
+  painPoints: [
+    'Missed a client call because power went out at the worst time',
+    'Lost unsaved work when your laptop died suddenly',
+    'Spending ₦30,000+ monthly on fuel for a loud, smelly generator',
+    'Telling your family "just wait, power will come back soon" — for the fifth time this week',
+  ],
+  solutionBody: "Plug it in. Charge it from solar. And the next time NEPA takes light, you don't even notice. No fumes. No noise. No fuel runs. Just clean, silent power — available the moment you need it.",
+  productCapacityDescription: '768Wh capacity · Powers laptops, fans, routers, lights, TVs, and small appliances simultaneously',
+  deliveryValue: '₦8,000 FREE',
+  bonus1Name: 'Extended Warranty Cover',
+  bonus1Description: 'Extended manufacturer warranty included at no extra cost — full parts &amp; service coverage so you never have to worry about repair bills',
+  bonus1Value: '₦45,000 FREE',
+  bonus2Name: 'Free Solar Panel Installation',
+  bonus2Description: "Add a compatible solar panel to your order and we'll professionally install it for free — so the sun recharges your battery while NEPA is away. Fuel bills: ₦0.",
+  bonus2Value: '₦35,000 FREE',
+  guaranteeTitle: '100% Satisfaction Guarantee — No Time Limit',
+  guaranteeBody: "If the EcoFlow RIVER 2 Pro doesn't keep your home or business running through every blackout exactly as promised, tell us and we'll make it right — full refund or replacement, no questions, no deadline. We're that confident this changes your daily life. The only risk you're taking is spending another month the way things are now.",
+  testimonials: [
+    {
+      quote: "NEPA took light for 11 hours last Tuesday. My laptop, router, and ring light ran the whole time. I finished two client deliverables and nobody even knew there was an outage on my end.",
+      attribution: 'Tunde A., Freelance Designer, Lagos',
+    },
+    {
+      quote: "I used to spend ₦40,000 a month on petrol for my generator. Since I got the EcoFlow RIVER 2 Pro with the solar panel, that cost is almost zero. It paid for itself faster than I expected.",
+      attribution: 'Chidinma O., Small Business Owner, Abuja',
+    },
+  ],
+  ctaHeadline: 'Stop losing hours — and money — to power cuts',
+  ctaSubtext: 'The next blackout is coming. The only question is whether it disrupts you or not.',
+};
+
+export const ecoflowRiver2ProTemplate: EmailTemplate = {
+  id: 'ecoflow-river-2-pro',
+  name: 'EcoFlow RIVER 2 Pro — Grand Slam Offer',
+  category: 'Marketing',
+  subject: "NEPA can't touch you anymore — here's how",
+  preheader: "The next blackout won't disrupt a single minute of your life. Here's everything included.",
+  body: generatePromoEmailHTML(ecoflowRiver2ProConfig),
+};
+
+export const hithiumEssSolarGeneratorConfig: PromoProductConfig = {
+  productName: 'Hithium ESS Solar Generator 314Ah',
+  tagline: 'Portable Power Bank Station',
+  priceDisplay: '₦465,562',
+  originalPriceDisplay: '₦572,000 if purchased separately',
+  ctaUrl: 'https://vissmingles.com/redirect?destination=https://marketplace.starprince.dev/details/product_id_115741_',
+  ctaText: 'Secure My Blackout-Proof Package',
+  supportContact: 'WhatsApp support',
+  senderName: 'Prince',
+  urgencyText: 'This offer — including the free bonuses — closes once stock runs out',
+  limitedUnits: 10,
+  deadlineText: 'Sunday midnight',
+  preheaderText: "The next blackout won't stop you — here's your permanent solution, with everything included.",
+  headerEyebrow: 'BLACKOUT-PROOF YOUR HOME &amp; BUSINESS',
+  headline: 'What If Your Power Backup Lasted 10,000 Cycles — and Paid for Itself in Months?',
+  subheadline: '314Ah capacity · 1000W output · 220V AC · 10,000+ cycle LFP battery<br>Built to last 27+ years of daily use. One investment. Decades of reliability.',
+  problemHeadline: 'NEPA takes light. You lose money. Again.',
+  problemBody1: "Every time power goes out, the clock starts ticking. Your laptop battery drops. Your Zoom call cuts off mid-sentence. Your customer is left waiting. Your child can't study. And you're sitting there — staring at a generator you have to fuel, maintain, and tolerate the noise of — hoping it doesn't fail <em>again</em>.",
+  problemBody2: `The average Nigerian professional loses <strong style="color:#DC2626;">4–8 hours of productive time</strong> every week to power interruptions. That's over <strong style="color:#DC2626;">25 full working days</strong> per year — gone.`,
+  painPoints: [
+    'Missed a client call because power went out at the worst time',
+    'Lost unsaved work when your laptop died suddenly',
+    'Spending ₦30,000+ monthly on fuel for a loud, smelly generator',
+    'Telling your family "just wait, power will come back soon" — for the fifth time this week',
+  ],
+  solutionBody: "One charge from solar or wall. And for the next 10,000 cycles — roughly 27 years of daily use — you have reliable, silent power. No fumes. No noise. No fuel runs. Just a battery engineered to outlast everything else you own.",
+  productCapacityDescription: '314Ah · 1000W output · 220V AC · 10,000+ cycle LFP battery · Powers laptops, fans, TVs, fridges & appliances simultaneously',
+  deliveryValue: '₦8,000 FREE',
+  bonus1Name: 'Extended Warranty Cover',
+  bonus1Description: 'Extended manufacturer warranty included at no extra cost — full parts &amp; service coverage so you never have to worry about repair bills',
+  bonus1Value: '₦45,000 FREE',
+  bonus2Name: 'Free Solar Panel Installation',
+  bonus2Description: "Add a compatible solar panel to your order and we'll professionally install it for free — so the sun recharges your battery while NEPA is away. Fuel bills: ₦0.",
+  bonus2Value: '₦35,000 FREE',
+  guaranteeTitle: '100% Satisfaction Guarantee — No Time Limit',
+  guaranteeBody: "If the Hithium ESS Solar Generator 314Ah doesn't keep your home or business running through every blackout exactly as promised, tell us and we'll make it right — full refund or replacement, no questions, no deadline. We're that confident this changes your daily life. The only risk you're taking is spending another month the way things are now.",
+  testimonials: [
+    {
+      quote: "NEPA took light for 11 hours last Tuesday. My laptop, router, and ring light ran the whole time on the Hithium ESS Solar Generator. I finished two client deliverables and nobody even knew there was an outage on my end.",
+      attribution: 'Tunde A., Freelance Designer, Lagos',
+    },
+    {
+      quote: "I used to spend ₦40,000 a month on petrol for my generator. Since I got the Hithium ESS Solar Generator 314Ah with the solar panel, that cost is almost zero. It paid for itself faster than I expected.",
+      attribution: 'Chidinma O., Small Business Owner, Abuja',
+    },
+  ],
+  ctaHeadline: 'Stop losing hours — and money — to power cuts',
+  ctaSubtext: 'The next blackout is coming. The only question is whether it disrupts you or not.',
+};
+
+export const hithiumEssSolarGeneratorTemplate: EmailTemplate = {
+  id: 'hithium-ess-solar-generator-314ah',
+  name: 'Hithium ESS Solar Generator 314Ah — Grand Slam Offer',
+  category: 'Marketing',
+  subject: "NEPA can't touch you anymore — here's how",
+  preheader: "The next blackout won't disrupt a single minute of your life. Here's everything included.",
+  body: generatePromoEmailHTML(hithiumEssSolarGeneratorConfig),
+};

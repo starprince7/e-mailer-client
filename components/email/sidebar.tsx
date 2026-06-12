@@ -1,7 +1,8 @@
 'use client';
 
-import { Inbox, Send, FileText, Settings } from 'lucide-react';
+import { Inbox, Send, FileText, Settings, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 interface SidebarProps {
   activeView: 'inbox' | 'sent' | 'compose' | 'settings';
@@ -42,6 +43,13 @@ export function Sidebar({ activeView, onViewChange }: SidebarProps) {
             </button>
           );
         })}
+        <Link
+          href="/bulk-send"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 transition-colors"
+        >
+          <Users className="h-5 w-5" />
+          Bulk Send
+        </Link>
       </nav>
     </div>
   );

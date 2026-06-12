@@ -14,6 +14,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
   const editorRef = useRef<HTMLDivElement | null>(null);
   const quillInstanceRef = useRef<unknown>(null);
   const lastExternalValueRef = useRef<string>('');
+  const isSyncingRef = useRef<boolean>(false);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -53,6 +54,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
       });
 
       quill.on('text-change', () => {
+        if (isSyncingRef.current) return;
         const html = quill.root.innerHTML;
         lastExternalValueRef.current = html;
         onChange(html);
@@ -61,8 +63,10 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
       quillInstanceRef.current = quill;
 
       if (value) {
+        isSyncingRef.current = true;
         quill.root.innerHTML = value;
         lastExternalValueRef.current = value;
+        isSyncingRef.current = false;
       }
     };
 
@@ -76,8 +80,10 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
     if (value === lastExternalValueRef.current) return;
 
     const selection = quill.getSelection();
+    isSyncingRef.current = true;
     quill.root.innerHTML = value || '';
     lastExternalValueRef.current = value || '';
+    isSyncingRef.current = false;
     if (selection) {
       quill.setSelection(selection);
     }

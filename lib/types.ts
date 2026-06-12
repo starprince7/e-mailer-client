@@ -28,6 +28,7 @@ export interface EmailTemplate {
   subject: string;
   body: string;
   category: string;
+  preheader?: string;
 }
 
 export interface EmailFormData {
