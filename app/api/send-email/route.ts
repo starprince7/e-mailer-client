@@ -1,25 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { sendEmailSchema } from '@/lib/validation';
+import { getConfig } from '@/lib/config';
 
 const rateLimit = new Map<string, { count: number; resetTime: number }>();
 
-const RATE_LIMIT_MAX = 10;
-const RATE_LIMIT_WINDOW = 60 * 1000;
-
-function checkRateLimit(identifier: string): boolean {
+function checkRateLimit(identifier: string, max: number, windowMs: number): boolean {
   const now = Date.now();
   const userLimit = rateLimit.get(identifier);
 
   if (!userLimit || now > userLimit.resetTime) {
     rateLimit.set(identifier, {
       count: 1,
-      resetTime: now + RATE_LIMIT_WINDOW,
+      resetTime: now + windowMs,
     });
     return true;
   }
 
-  if (userLimit.count >= RATE_LIMIT_MAX) {
+  if (userLimit.count >= max) {
     return false;
   }
 
@@ -29,7 +27,8 @@ function checkRateLimit(identifier: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = request.headers.get('x-api-key') || process.env.RESEND_API_KEY;
+    const config = getConfig();
+    const apiKey = request.headers.get('x-api-key') || config.resendApiKey;
 
     if (!apiKey) {
       return NextResponse.json(
@@ -40,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
 
-    if (!checkRateLimit(clientIp)) {
+    if (!checkRateLimit(clientIp, config.rateLimitMax, config.rateLimitWindowMs)) {
       return NextResponse.json(
         { error: 'Rate limit exceeded. Please try again later.' },
         { status: 429 }
@@ -79,9 +78,16 @@ export async function POST(request: NextRequest) {
     const ccEmails = cc ? cc.split(',').map(email => email.trim()) : undefined;
     const bccEmails = bcc ? bcc.split(',').map(email => email.trim()) : undefined;
 
-    const fromTitle = formData.get('fromTitle') as string || 'Prince ' ;
+    if (!config.fromEmail) {
+      return NextResponse.json(
+        { error: 'Sender address is not configured. Set "fromEmail" in app.config.json or the FROM_EMAIL environment variable.' },
+        { status: 500 }
+      );
+    }
+
+    const fromTitle = formData.get('fromTitle') as string || config.fromName;
     const emailData: any = {
-      from: `${fromTitle} <mailer@starprince.dev>`,
+      from: `${fromTitle} <${config.fromEmail}>`,
       to: toEmails,
       subject,
       html: html || `<p>${body.replace(/\n/g, '<br>')}</p>`,
@@ -120,8 +126,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminApiKey = process.env.RESEND_API_KEY;
+    const adminEmail = config.adminEmail;
+    const adminApiKey = config.resendApiKey;
     if (adminEmail && adminApiKey) {
       const userAgent = request.headers.get('user-agent') || 'unknown';
       const timestamp = new Date().toISOString();
@@ -167,7 +173,7 @@ export async function POST(request: NextRequest) {
 
       new Resend(adminApiKey).emails
         .send({
-          from: 'Mailer Admin <mailer@starprince.dev>',
+          from: `${config.fromName} Admin <${config.fromEmail}>`,
           to: [adminEmail],
           subject: `[Admin Alert] Email sent to ${to} — ${timestamp}`,
           html: adminHtml,

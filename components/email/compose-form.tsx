@@ -4,50 +4,53 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { RichTextEditor } from './rich-text-editor';
-import { emailTemplates } from '@/lib/templates';
-import { Paperclip, X, Send, Loader2, CheckCircle, AlertCircle, Settings } from 'lucide-react';
+import { emailTemplates, resolveTemplateVars } from '@/lib/templates';
+import { Paperclip, X, Send, Loader2, CheckCircle, AlertCircle, Settings, Eye, Code, Type } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { useApiKeyStatus } from '@/components/api-key-banner';
 import { formatFileSize } from '@/lib/utils';
 
 interface ComposeFormProps {
   onSuccess?: () => void;
+  onOpenSettings?: () => void;
 }
 
-export function ComposeForm({ onSuccess }: ComposeFormProps) {
+export function ComposeForm({ onSuccess, onOpenSettings }: ComposeFormProps) {
   const [to, setTo] = useState('');
   const [cc, setCc] = useState('');
   const [bcc, setBcc] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
-  const [fromTitle, setFromTitle] = useState('Prince');
+  const [fromTitle, setFromTitle] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showCc, setShowCc] = useState(false);
   const [showBcc, setShowBcc] = useState(false);
-  const [apiKeyStatus, setApiKeyStatus] = useState<'checking' | 'env' | 'local' | 'missing'>('checking');
+  const apiKeyStatus = useApiKeyStatus();
+  const [templateVars, setTemplateVars] = useState<Record<string, string>>({});
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [editorMode, setEditorMode] = useState<'rich' | 'html' | 'preview'>('rich');
+  const [defaultFromName, setDefaultFromName] = useState('');
   const { toast } = useToast();
 
-  // Check API key status on component mount
+  const isHtmlTemplate = body.trimStart().toLowerCase().startsWith('<!doctype');
+
   useEffect(() => {
-    const checkApiKeyStatus = async () => {
+    const loadAppConfig = async () => {
       try {
-        const response = await fetch('/api/check-env-key');
+        const response = await fetch('/api/config');
         const data = await response.json();
-        
-        if (data.hasEnvKey) {
-          setApiKeyStatus('env');
-        } else {
-          const localKey = localStorage.getItem('resend_api_key');
-          setApiKeyStatus(localKey ? 'local' : 'missing');
+        if (data.fromName) {
+          setDefaultFromName(data.fromName);
+          setFromTitle((prev) => prev || data.fromName);
         }
+        if (data.templateVars) setTemplateVars(data.templateVars);
       } catch (error) {
-        console.error('Failed to check API key status:', error);
-        const localKey = localStorage.getItem('resend_api_key');
-        setApiKeyStatus(localKey ? 'local' : 'missing');
+        console.error('Failed to load app config:', error);
       }
     };
 
-    checkApiKeyStatus();
+    loadAppConfig();
   }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,32 +76,45 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
   };
 
   const handleTemplateSelect = (templateId: string) => {
+    setSelectedTemplate(templateId);
+    if (!templateId) {
+      clearTemplate();
+      return;
+    }
     const template = emailTemplates.find(t => t.id === templateId);
     if (template) {
-      setSubject(template.subject);
-      setBody(template.body);
+      setSubject(resolveTemplateVars(template.subject, templateVars));
+      const resolvedBody = resolveTemplateVars(template.body, templateVars);
+      setBody(resolvedBody);
+      setEditorMode(resolvedBody.trimStart().toLowerCase().startsWith('<!doctype') ? 'html' : 'rich');
     }
+  };
+
+  const clearTemplate = () => {
+    setSelectedTemplate('');
+    setSubject('');
+    setBody('');
+    setEditorMode('rich');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check if environment variable API key is available first
-    let hasEnvKey = false;
-    let apiKey: string | null = null;
-    
-    try {
-      const response = await fetch('/api/check-env-key');
-      const data = await response.json();
-      hasEnvKey = data.hasEnvKey;
-    } catch (error) {
-      console.error('Failed to check environment key:', error);
-    }
-    
-    // If no env key, fall back to localStorage
-    if (!hasEnvKey) {
-      apiKey = localStorage.getItem('resend_api_key');
-      if (!apiKey) {
+    // The browser-stored key is authoritative — use it when present
+    const apiKey = localStorage.getItem('resend_api_key');
+
+    if (!apiKey) {
+      // No browser key — check for a server-configured key
+      let hasServerKey = false;
+      try {
+        const response = await fetch('/api/check-env-key');
+        const data = await response.json();
+        hasServerKey = data.hasEnvKey;
+      } catch (error) {
+        console.error('Failed to check environment key:', error);
+      }
+
+      if (!hasServerKey) {
         toast({
           title: 'API Key Required',
           description: 'Please configure your Resend API key in Settings first.',
@@ -151,7 +167,9 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
       setBcc('');
       setSubject('');
       setBody('');
-      setFromTitle('Prince');
+      setFromTitle(defaultFromName);
+      setSelectedTemplate('');
+      setEditorMode('rich');
       setAttachments([]);
       setShowCc(false);
       setShowBcc(false);
@@ -275,13 +293,25 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
           />
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-              Use Template (Optional)
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Use Template (Optional)
+              </label>
+              {selectedTemplate && (
+                <button
+                  type="button"
+                  onClick={clearTemplate}
+                  className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                >
+                  <X className="h-3 w-3" />
+                  Clear template
+                </button>
+              )}
+            </div>
             <select
               className="w-full h-10 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
               onChange={(e) => handleTemplateSelect(e.target.value)}
-              defaultValue=""
+              value={selectedTemplate}
             >
               <option value="">Select a template...</option>
               {emailTemplates.map((template) => (
@@ -290,17 +320,100 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
                 </option>
               ))}
             </select>
+            {isHtmlTemplate && (
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                This is a full HTML email — use the HTML or Preview tab below to edit or view it.
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-              Message
-            </label>
-            <RichTextEditor
-              value={body}
-              onChange={setBody}
-              placeholder="Write your email..."
-            />
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Message
+              </label>
+              <div className="flex items-center gap-1 border border-zinc-200 dark:border-zinc-700 rounded-md p-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!isHtmlTemplate) setEditorMode('rich');
+                  }}
+                  disabled={isHtmlTemplate}
+                  title={isHtmlTemplate ? 'HTML templates cannot be edited in rich text mode — use the HTML tab' : undefined}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
+                    editorMode === 'rich'
+                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
+                      : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+                  } ${isHtmlTemplate ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <Type className="h-3 w-3" />
+                  Rich Text
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditorMode('html')}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
+                    editorMode === 'html'
+                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
+                      : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+                  }`}
+                >
+                  <Code className="h-3 w-3" />
+                  HTML
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditorMode('preview')}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${
+                    editorMode === 'preview'
+                      ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
+                      : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
+                  }`}
+                >
+                  <Eye className="h-3 w-3" />
+                  Preview
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: editorMode === 'rich' ? 'block' : 'none' }}>
+              <RichTextEditor
+                value={isHtmlTemplate ? '<p></p>' : body}
+                onChange={setBody}
+                placeholder="Write your email..."
+              />
+            </div>
+
+            {editorMode === 'html' && (
+              <textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder="Paste or type raw HTML here..."
+                className="w-full h-80 rounded-md border border-zinc-300 bg-white px-3 py-2 text-xs font-mono dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 resize-y"
+                spellCheck={false}
+              />
+            )}
+
+            {editorMode === 'preview' && (
+              <div className="rounded-md border border-zinc-300 dark:border-zinc-700 overflow-hidden">
+                <div className="px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">Preview</span>
+                </div>
+                {body ? (
+                  <iframe
+                    srcDoc={body}
+                    sandbox="allow-same-origin"
+                    title="Email Preview"
+                    className="w-full bg-white"
+                    style={{ height: '500px', border: 'none' }}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-48 text-zinc-400 dark:text-zinc-600 text-sm">
+                    No content yet. Write your email or select a template.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {attachments.length > 0 && (
@@ -360,7 +473,7 @@ export function ComposeForm({ onSuccess }: ComposeFormProps) {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => window.location.href = '#settings'}
+              onClick={() => onOpenSettings?.()}
             >
               <Settings className="h-4 w-4 mr-2" />
               Configure API Key

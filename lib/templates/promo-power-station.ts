@@ -111,28 +111,28 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
   <![endif]-->
   <style type="text/css">
     /* Reset */
-    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; font-family: Inter, Arial, sans-serif; }
     table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
     img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
 
     /* Base */
-    body { margin: 0 !important; padding: 0 !important; background-color: #F0F4F8; width: 100% !important; }
+    body { margin: 0 !important; padding: 0 !important; background-color: #fbf5ea; width: 100% !important; color: #21190f; }
 
     /* Hover Effects for Modern Clients */
     .cta-btn {
       transition: all 0.22s ease-in-out !important;
     }
     .cta-btn:hover {
-      background-color: #EA580C !important;
-      border-color: #EA580C !important;
-      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.45) !important;
+      background: linear-gradient(135deg,#fff3c2,#f4ce54,#e2a11b) !important;
+      border-color: #f4ce54 !important;
+      box-shadow: 0 6px 22px rgba(216,154,18, 0.55) !important;
       transform: translateY(-1px) scale(1.02) !important;
     }
 
     /* Mobile */
     @media only screen and (max-width: 620px) {
       .wrapper { width: 100% !important; padding: 0 !important; }
-      .container { width: 100% !important; }
+      .container { width: 100% !important; border-radius: 16px !important; }
       .mobile-pad { padding-left: 20px !important; padding-right: 20px !important; }
       .header-headline { font-size: 24px !important; line-height: 1.3 !important; }
       .cta-btn-td { width: 100% !important; display: block !important; }
@@ -152,25 +152,25 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
     }
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:#F0F4F8;">
+<body style="margin:0;padding:0;background-color:#fbf5ea;">
 
   <!-- Preheader (hidden preview text) -->
-  <div style="display:none;font-size:1px;color:#F0F4F8;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
+  <div style="display:none;font-size:1px;color:#fbf5ea;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
     ${preheaderText}
   </div>
 
   <!-- OUTER WRAPPER -->
-  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#F0F4F8;">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#fbf5ea;">
     <tr>
       <td align="center" style="padding: 24px 12px;">
 
         <!-- MAIN CONTAINER -->
-        <table class="container" role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#FFFFFF; border-radius:12px; overflow:hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+        <table class="container" role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#FFFFFF; border-radius:28px; overflow:hidden; border:1px solid rgba(214,180,93,.28); box-shadow: 0 6px 28px rgba(33,25,15,0.05);">
 
           <!-- ===== URGENCY BANNER ===== -->
           <tr>
-            <td style="background-color:#DC2626; padding: 10px 32px; text-align:center;">
-              <p style="margin:0; color:#FFFFFF; font-size:13px; font-weight:700; letter-spacing:0.5px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+            <td style="background-color:#21190f; padding: 12px 32px; text-align:center; border-bottom:1px solid rgba(214,180,93,.15);">
+              <p style="margin:0; color:#f6cf5a; font-size:13px; font-weight:900; letter-spacing:0.5px; font-family:Inter,Arial,sans-serif;">
                 ⚡ ${urgencyText}${limitedUnits ? ` — Only ${limitedUnits} units remaining` : ''}${deadlineText ? ` · Offer ends ${deadlineText}` : ''}
               </p>
             </td>
@@ -178,19 +178,24 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
 
           <!-- ===== HEADER / DREAM OUTCOME ===== -->
           <tr>
-            <td class="mobile-pad" style="background-color:#0C1A2E; padding: 48px 40px 40px; text-align:center;">
+            <td class="mobile-pad" style="background-color:#FFFFFF; padding: 48px 40px 40px; text-align:center;">
+              <!-- VissMingle Signature Badge -->
+              <div style="display:inline-block; background-color:#21190f; color:#f6cf5a; border-radius:16px; padding:12px 14px; font-weight:900; letter-spacing:-.04em; margin-bottom:24px; font-family:Inter,Arial,sans-serif;">
+                VissMingle
+              </div>
+              
               <!-- Eyebrow -->
-              <p style="margin:0 0 16px; color:#F97316; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0 0 16px; color:#b47f18; font-size:12px; font-weight:900; letter-spacing:2px; text-transform:uppercase; font-family:Inter,Arial,sans-serif;">
                 ${headerEyebrow}
               </p>
-              <!-- Main Headline (Hormozi: lead with DREAM OUTCOME, not product name) -->
-              <h1 class="header-headline" style="margin:0 0 20px; color:#FFFFFF; font-size:30px; font-weight:800; line-height:1.25; letter-spacing:-0.5px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <!-- Main Headline -->
+              <h1 class="header-headline" style="margin:0 0 20px; color:#17120c; font-size:30px; font-weight:900; line-height:1.25; letter-spacing:-0.5px; font-family:Inter,Arial,sans-serif;">
                 ${headline}
               </h1>
-              <p style="margin:0 0 24px; color:#94A3B8; font-size:16px; line-height:1.7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0 0 28px; color:#65553f; font-size:16px; line-height:1.7; font-family:Inter,Arial,sans-serif;">
                 ${subheadline}
               </p>
-              <p style="margin:0; color:#F97316; font-size:18px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0; color:#21190f; font-size:18px; font-weight:900; font-family:Inter,Arial,sans-serif;">
                 Hi {{firstName}}, this is for you 👇
               </p>
             </td>
@@ -198,22 +203,22 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
 
           <!-- ===== PROBLEM AGITATION (PAS) ===== -->
           <tr>
-            <td class="mobile-pad" style="padding: 40px 40px 32px; background-color:#FFFFFF;">
-              <h2 style="margin:0 0 16px; color:#111827; font-size:20px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+            <td class="mobile-pad" style="padding: 40px 40px 32px; background-color:#FAF6EE; border-top: 1px solid rgba(214,180,93,.15); border-bottom: 1px solid rgba(214,180,93,.15);">
+              <h2 style="margin:0 0 16px; color:#17120c; font-size:20px; font-weight:900; font-family:Inter,Arial,sans-serif;">
                 ${problemHeadline}
               </h2>
-              <p style="margin:0 0 20px; color:#4B5563; font-size:15px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0 0 20px; color:#4c4031; font-size:15px; line-height:1.8; font-family:Inter,Arial,sans-serif;">
                 ${problemBody1}
               </p>
-              <p style="margin:0 0 20px; color:#4B5563; font-size:15px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0 0 20px; color:#4c4031; font-size:15px; line-height:1.8; font-family:Inter,Arial,sans-serif;">
                 ${problemBody2}
               </p>
               <!-- Pain bullet list -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#FEF2F2; border-radius:8px; border-left:4px solid #DC2626;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#F5EFE4; border-radius:12px; border-left:4px solid #21190f;">
                 <tr>
                   <td style="padding:20px 24px;">
-                    <p style="margin:0 0 10px; color:#991B1B; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">Sound familiar?</p>
-                    ${painPoints.map((point, i) => `<p style="margin:0${i < painPoints.length - 1 ? ' 0 8px' : ''}; color:#374151; font-size:14px; line-height:1.7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">✗ &nbsp;${point}</p>`).join('\n                    ')}
+                    <p style="margin:0 0 10px; color:#21190f; font-size:13px; font-weight:900; letter-spacing:1px; text-transform:uppercase; font-family:Inter,Arial,sans-serif;">Sound familiar?</p>
+                    ${painPoints.map((point, i) => `<p style="margin:0${i < painPoints.length - 1 ? ' 0 8px' : ''}; color:#4c4031; font-size:14px; line-height:1.7; font-family:Inter,Arial,sans-serif;">✗ &nbsp;${point}</p>`).join('\n                    ')}
                   </td>
                 </tr>
               </table>
@@ -222,45 +227,45 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
 
           <!-- ===== SOLUTION BRIDGE ===== -->
           <tr>
-            <td class="mobile-pad" style="padding: 32px 40px; background-color:#F8FAFC; text-align:center;">
-              <p style="margin:0 0 8px; color:#F97316; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">THE SOLUTION</p>
-              <h2 style="margin:0 0 12px; color:#0C1A2E; font-size:26px; font-weight:800; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+            <td class="mobile-pad" style="padding: 40px 40px; background-color:#FFFFFF; text-align:center;">
+              <p style="margin:0 0 8px; color:#b47f18; font-size:12px; font-weight:900; letter-spacing:2px; text-transform:uppercase; font-family:Inter,Arial,sans-serif;">THE SOLUTION</p>
+              <h2 style="margin:0 0 12px; color:#17120c; font-size:26px; font-weight:900; font-family:Inter,Arial,sans-serif;">
                 Meet the ${productName}
               </h2>
-              <p style="margin:0 0 16px; color:#6B7280; font-size:15px; font-style:italic; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${tagline}</p>
-              <p style="margin:0 auto; max-width:460px; color:#374151; font-size:15px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0 0 16px; color:#65553f; font-size:15px; font-style:italic; font-family:Inter,Arial,sans-serif;">${tagline}</p>
+              <p style="margin:0 auto; max-width:460px; color:#4c4031; font-size:15px; line-height:1.8; font-family:Inter,Arial,sans-serif;">
                 ${solutionBody}
               </p>
             </td>
           </tr>
 
-          <!-- ===== VALUE STACK (Hormozi: name everything, show perceived value) ===== -->
+          <!-- ===== VALUE STACK ===== -->
           <tr>
-            <td class="mobile-pad" style="padding: 40px 40px 32px; background-color:#FFFFFF;">
-              <p style="margin:0 0 6px; color:#F97316; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; text-align:center; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">EVERYTHING INCLUDED TODAY</p>
-              <h2 style="margin:0 0 28px; color:#0C1A2E; font-size:22px; font-weight:800; text-align:center; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+            <td class="mobile-pad" style="padding: 40px 40px 32px; background-color:#FAF6EE; border-top: 1px solid rgba(214,180,93,.15);">
+              <p style="margin:0 0 6px; color:#b47f18; font-size:12px; font-weight:900; letter-spacing:2px; text-transform:uppercase; text-align:center; font-family:Inter,Arial,sans-serif;">EVERYTHING INCLUDED TODAY</p>
+              <h2 style="margin:0 0 28px; color:#17120c; font-size:22px; font-weight:900; text-align:center; font-family:Inter,Arial,sans-serif;">
                 Your Complete Blackout-Proof Package
               </h2>
 
               <!-- Stack Item 1 — Core Product -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:1px solid #E5E7EB; border-radius:8px; overflow:hidden;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:1px solid rgba(214,180,93,.22); border-radius:16px; overflow:hidden; background-color:#FFFFFF;">
                 <tr>
                   <td style="padding:16px 20px;">
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td width="32" valign="top" style="padding-top:2px;">
-                          <span style="color:#F97316; font-size:20px; font-weight:800;">✓</span>
+                          <span style="color:#b47f18; font-size:20px; font-weight:900;">✓</span>
                         </td>
                         <td>
-                          <p style="margin:0 0 2px; color:#111827; font-size:15px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                          <p style="margin:0 0 4px; color:#17120c; font-size:15px; font-weight:900; font-family:Inter,Arial,sans-serif;">
                             ${productName} ${tagline}
                           </p>
-                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                          <p style="margin:0; color:#65553f; font-size:13px; line-height:1.6; font-family:Inter,Arial,sans-serif;">
                             ${productCapacityDescription}
                           </p>
                         </td>
                         <td width="90" align="right" valign="top">
-                          <span class="value-label" style="background-color:#DCFCE7; color:#15803D; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">Core Item</span>
+                          <span class="value-label" style="background-color:#21190f; color:#f6cf5a; font-size:11px; font-weight:900; padding:5px 12px; border-radius:20px; white-space:nowrap; font-family:Inter,Arial,sans-serif; text-transform:uppercase; letter-spacing:0.3px;">Core Item</span>
                         </td>
                       </tr>
                     </table>
@@ -269,24 +274,24 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
               </table>
 
               <!-- Stack Item 2 — Free Nationwide Delivery -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:1px solid #E5E7EB; border-radius:8px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:1px solid rgba(214,180,93,.22); border-radius:16px; overflow:hidden; background-color:#FFFFFF;">
                 <tr>
                   <td style="padding:16px 20px;">
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td width="32" valign="top" style="padding-top:2px;">
-                          <span style="color:#F97316; font-size:20px; font-weight:800;">✓</span>
+                          <span style="color:#b47f18; font-size:20px; font-weight:900;">✓</span>
                         </td>
                         <td>
-                          <p style="margin:0 0 2px; color:#111827; font-size:15px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                          <p style="margin:0 0 4px; color:#17120c; font-size:15px; font-weight:900; font-family:Inter,Arial,sans-serif;">
                             Free Nationwide Delivery
                           </p>
-                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                          <p style="margin:0; color:#65553f; font-size:13px; line-height:1.6; font-family:Inter,Arial,sans-serif;">
                             Delivered to your door anywhere in Nigeria — tracked and insured
                           </p>
                         </td>
                         <td width="90" align="right" valign="top">
-                          <span class="value-label" style="background-color:#FEF3C7; color:#92400E; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${deliveryValue}</span>
+                          <span class="value-label" style="background-color:#FFF9E6; color:#B47F18; border:1px solid rgba(214,180,93,.3); font-size:11px; font-weight:900; padding:4px 10px; border-radius:20px; white-space:nowrap; font-family:Inter,Arial,sans-serif;">${deliveryValue}</span>
                         </td>
                       </tr>
                     </table>
@@ -295,25 +300,25 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
               </table>
 
               <!-- Stack Item 3 — Extended Warranty (Bonus) -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:2px solid #F97316; border-radius:8px; background-color:#FFF7ED;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:2px solid #d89a12; border-radius:16px; overflow:hidden; background-color:#FCF8EC;">
                 <tr>
                   <td style="padding:16px 20px;">
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td width="32" valign="top" style="padding-top:2px;">
-                          <span style="color:#F97316; font-size:20px;">🎁</span>
+                          <span style="color:#b47f18; font-size:20px;">🎁</span>
                         </td>
                         <td>
-                          <p style="margin:0 0 2px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-                            <span style="color:#111827; font-size:15px; font-weight:700;">BONUS #1: ${bonus1Name}</span>
-                            <span class="bonus-tag" style="background-color:#F97316; color:#FFFFFF; font-size:12px; font-weight:700; padding:3px 10px; border-radius:20px; margin-left:8px; white-space:nowrap;">BONUS</span>
+                          <p style="margin:0 0 4px; font-family:Inter,Arial,sans-serif;">
+                            <span style="color:#17120c; font-size:15px; font-weight:900;">BONUS #1: ${bonus1Name}</span>
+                            <span class="bonus-tag" style="background-color:#21190f; color:#f6cf5a; font-size:10px; font-weight:900; padding:3px 8px; border-radius:20px; margin-left:8px; white-space:nowrap; vertical-align:middle; letter-spacing:0.3px; text-transform:uppercase;">BONUS</span>
                           </p>
-                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                          <p style="margin:0; color:#65553f; font-size:13px; line-height:1.6; font-family:Inter,Arial,sans-serif;">
                             ${bonus1Description}
                           </p>
                         </td>
                         <td width="90" align="right" valign="top">
-                          <span class="value-label" style="background-color:#FEF3C7; color:#92400E; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${bonus1Value}</span>
+                          <span class="value-label" style="background-color:#FFF9E6; color:#B47F18; border:1px solid rgba(214,180,93,.3); font-size:11px; font-weight:900; padding:4px 10px; border-radius:20px; white-space:nowrap; font-family:Inter,Arial,sans-serif;">${bonus1Value}</span>
                         </td>
                       </tr>
                     </table>
@@ -322,25 +327,25 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
               </table>
 
               <!-- Stack Item 4 — Free Solar Panel Installation (Bonus) -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:2px solid #F97316; border-radius:8px; background-color:#FFF7ED;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:2px solid #d89a12; border-radius:16px; overflow:hidden; background-color:#FCF8EC;">
                 <tr>
                   <td style="padding:16px 20px;">
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td width="32" valign="top" style="padding-top:2px;">
-                          <span style="color:#F97316; font-size:20px;">🎁</span>
+                          <span style="color:#b47f18; font-size:20px;">🎁</span>
                         </td>
                         <td>
-                          <p style="margin:0 0 2px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-                            <span style="color:#111827; font-size:15px; font-weight:700;">BONUS #2: ${bonus2Name}</span>
-                            <span class="bonus-tag" style="background-color:#F97316; color:#FFFFFF; font-size:12px; font-weight:700; padding:3px 10px; border-radius:20px; margin-left:8px; white-space:nowrap;">BONUS</span>
+                          <p style="margin:0 0 4px; font-family:Inter,Arial,sans-serif;">
+                            <span style="color:#17120c; font-size:15px; font-weight:900;">BONUS #2: ${bonus2Name}</span>
+                            <span class="bonus-tag" style="background-color:#21190f; color:#f6cf5a; font-size:10px; font-weight:900; padding:3px 8px; border-radius:20px; margin-left:8px; white-space:nowrap; vertical-align:middle; letter-spacing:0.3px; text-transform:uppercase;">BONUS</span>
                           </p>
-                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                          <p style="margin:0; color:#65553f; font-size:13px; line-height:1.6; font-family:Inter,Arial,sans-serif;">
                             ${bonus2Description}
                           </p>
                         </td>
                         <td width="90" align="right" valign="top">
-                          <span class="value-label" style="background-color:#FEF3C7; color:#92400E; font-size:12px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${bonus2Value}</span>
+                          <span class="value-label" style="background-color:#FFF9E6; color:#B47F18; border:1px solid rgba(214,180,93,.3); font-size:11px; font-weight:900; padding:4px 10px; border-radius:20px; white-space:nowrap; font-family:Inter,Arial,sans-serif;">${bonus2Value}</span>
                         </td>
                       </tr>
                     </table>
@@ -349,19 +354,19 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
               </table>
 
               <!-- Stack Item 5 — Priority WhatsApp Support -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:1px solid #E5E7EB; border-radius:8px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:12px; border:1px solid rgba(214,180,93,.22); border-radius:16px; overflow:hidden; background-color:#FFFFFF;">
                 <tr>
                   <td style="padding:16px 20px;">
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td width="32" valign="top" style="padding-top:2px;">
-                          <span style="color:#F97316; font-size:20px; font-weight:800;">✓</span>
+                          <span style="color:#b47f18; font-size:20px; font-weight:900;">✓</span>
                         </td>
                         <td>
-                          <p style="margin:0 0 2px; color:#111827; font-size:15px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                          <p style="margin:0 0 4px; color:#17120c; font-size:15px; font-weight:900; font-family:Inter,Arial,sans-serif;">
                             Priority WhatsApp Support
                           </p>
-                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                          <p style="margin:0; color:#65553f; font-size:13px; line-height:1.6; font-family:Inter,Arial,sans-serif;">
                             Direct line to our technical team — any question, any time, answered fast
                           </p>
                         </td>
@@ -372,19 +377,19 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
               </table>
 
               <!-- Stack Item 6 — Blackout Survival Guide -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid #E5E7EB; border-radius:8px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border:1px solid rgba(214,180,93,.22); border-radius:16px; overflow:hidden; background-color:#FFFFFF;">
                 <tr>
                   <td style="padding:16px 20px;">
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td width="32" valign="top" style="padding-top:2px;">
-                          <span style="color:#F97316; font-size:20px; font-weight:800;">✓</span>
+                          <span style="color:#b47f18; font-size:20px; font-weight:900;">✓</span>
                         </td>
                         <td>
-                          <p style="margin:0 0 2px; color:#111827; font-size:15px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                          <p style="margin:0 0 4px; color:#17120c; font-size:15px; font-weight:900; font-family:Inter,Arial,sans-serif;">
                             "The Blackout Survival Guide" (Digital PDF)
                           </p>
-                          <p style="margin:0; color:#6B7280; font-size:13px; line-height:1.6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                          <p style="margin:0; color:#65553f; font-size:13px; line-height:1.6; font-family:Inter,Arial,sans-serif;">
                             Device compatibility chart, optimised power load schedule, and a step-by-step setup guide to maximise your battery life from day one
                           </p>
                         </td>
@@ -395,18 +400,18 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
               </table>
 
               <!-- Total Value Summary -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top:24px; background-color:#F8FAFC; border-radius:8px; border:1px dashed #CBD5E1;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top:24px; background-color:#21190f; border-radius:16px; border:1px solid rgba(214,180,93,.28);">
                 <tr>
                   <td style="padding:20px 24px;">
                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td>
-                          <p style="margin:0 0 4px; color:#6B7280; font-size:13px; font-weight:600; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; text-transform:uppercase; letter-spacing:0.5px;">Total Package Value</p>
-                          <p style="margin:0; color:#9CA3AF; font-size:13px; text-decoration:line-through; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${originalPriceDisplay}</p>
+                          <p style="margin:0 0 6px; color:#f6cf5a; font-size:13px; font-weight:900; font-family:Inter,Arial,sans-serif; text-transform:uppercase; letter-spacing:0.5px;">Total Package Value</p>
+                          <p style="margin:0; color:#857564; font-size:14px; text-decoration:line-through; font-family:Inter,Arial,sans-serif;">${originalPriceDisplay}</p>
                         </td>
                         <td align="right">
-                          <p style="margin:0 0 2px; color:#6B7280; font-size:12px; font-weight:600; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; text-align:right;">Your Price Today</p>
-                          <p class="price-big" style="margin:0; color:#0C1A2E; font-size:36px; font-weight:800; line-height:1; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; text-align:right;">${priceDisplay}</p>
+                          <p style="margin:0 0 4px; color:#857564; font-size:12px; font-weight:900; font-family:Inter,Arial,sans-serif; text-align:right;">Your Price Today</p>
+                          <p class="price-big" style="margin:0; color:#FFFFFF; font-size:36px; font-weight:900; line-height:1; font-family:Inter,Arial,sans-serif; text-align:right;">${priceDisplay}</p>
                         </td>
                       </tr>
                     </table>
@@ -417,18 +422,18 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
             </td>
           </tr>
 
-          <!-- ===== GUARANTEE (Hormozi: Risk Reversal) ===== -->
+          <!-- ===== GUARANTEE ===== -->
           <tr>
-            <td class="mobile-pad" style="padding: 32px 40px; background-color:#F0FDF4;">
+            <td class="mobile-pad" style="padding: 36px 40px; background-color:#FAF5E6; border-top:1px solid rgba(214,180,93,.22); border-bottom:1px solid rgba(214,180,93,.22);">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td width="48" valign="top">
                     <span style="font-size:36px; line-height:1;">🛡️</span>
                   </td>
                   <td style="padding-left:16px;">
-                    <p style="margin:0 0 6px; color:#15803D; font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">OUR PROMISE TO YOU</p>
-                    <p style="margin:0 0 8px; color:#14532D; font-size:17px; font-weight:800; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">${guaranteeTitle}</p>
-                    <p style="margin:0; color:#374151; font-size:14px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                    <p style="margin:0 0 6px; color:#b47f18; font-size:13px; font-weight:900; letter-spacing:1.5px; text-transform:uppercase; font-family:Inter,Arial,sans-serif;">OUR PROMISE TO YOU</p>
+                    <p style="margin:0 0 10px; color:#17120c; font-size:18px; font-weight:900; font-family:Inter,Arial,sans-serif;">${guaranteeTitle}</p>
+                    <p style="margin:0; color:#4c4031; font-size:14px; line-height:1.8; font-family:Inter,Arial,sans-serif;">
                       ${guaranteeBody}
                     </p>
                   </td>
@@ -439,16 +444,16 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
 
           <!-- ===== SOCIAL PROOF ===== -->
           <tr>
-            <td class="mobile-pad" style="padding: 32px 40px; background-color:#FFFFFF;">
-              <p style="margin:0 0 20px; color:#F97316; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; text-align:center; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">WHAT OTHERS ARE SAYING</p>
+            <td class="mobile-pad" style="padding: 40px 40px 32px; background-color:#FFFFFF;">
+              <p style="margin:0 0 20px; color:#b47f18; font-size:12px; font-weight:900; letter-spacing:2px; text-transform:uppercase; text-align:center; font-family:Inter,Arial,sans-serif;">WHAT OTHERS ARE SAYING</p>
 
-              ${testimonials.map((t, i) => `<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="${i < testimonials.length - 1 ? 'margin-bottom:16px; ' : ''}background-color:#F8FAFC; border-radius:8px; border-left:4px solid #F97316;">
+              ${testimonials.map((t, i) => `<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="${i < testimonials.length - 1 ? 'margin-bottom:16px; ' : ''}background-color:#FAF6EE; border-radius:16px; border-left:4px solid #d89a12;">
                 <tr>
                   <td style="padding:20px 24px;">
-                    <p style="margin:0 0 10px; color:#111827; font-size:14px; font-style:italic; line-height:1.7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                    <p style="margin:0 0 10px; color:#17120c; font-size:14px; font-style:italic; line-height:1.7; font-family:Inter,Arial,sans-serif;">
                       "${t.quote}"
                     </p>
-                    <p style="margin:0; color:#6B7280; font-size:13px; font-weight:600; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">— ${t.attribution}</p>
+                    <p style="margin:0; color:#65553f; font-size:13px; font-weight:700; font-family:Inter,Arial,sans-serif;">— ${t.attribution}</p>
                   </td>
                 </tr>
               </table>`).join('\n              ')}
@@ -457,13 +462,13 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
 
           <!-- ===== SCARCITY + CTA ===== -->
           <tr>
-            <td class="mobile-pad" style="padding: 40px 40px 48px; background-color:#0C1A2E; text-align:center;">
+            <td class="mobile-pad" style="padding: 44px 40px 48px; background-color:#21190f; text-align:center;">
               <!-- Scarcity -->
               ${limitedUnits ? `
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto 28px; background-color:#DC2626; border-radius:8px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto 28px; background-color:#451a1a; border:1px solid #DC2626; border-radius:12px;">
                 <tr>
                   <td style="padding:12px 24px;">
-                    <p style="margin:0; color:#FFFFFF; font-size:14px; font-weight:700; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+                    <p style="margin:0; color:#FF9999; font-size:14px; font-weight:900; font-family:Inter,Arial,sans-serif;">
                       🔴 &nbsp;WARNING: Only ${limitedUnits} units available at this offer price
                     </p>
                   </td>
@@ -471,25 +476,25 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
               </table>
               ` : ''}
 
-              <h2 style="margin:0 0 12px; color:#FFFFFF; font-size:22px; font-weight:800; line-height:1.3; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <h2 style="margin:0 0 12px; color:#FFFFFF; font-size:22px; font-weight:900; line-height:1.3; font-family:Inter,Arial,sans-serif;">
                 ${ctaHeadline}
               </h2>
-              <p style="margin:0 0 28px; color:#94A3B8; font-size:15px; line-height:1.7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0 0 28px; color:#C4B59F; font-size:15px; line-height:1.7; font-family:Inter,Arial,sans-serif;">
                 ${ctaSubtext}
               </p>
 
-              <!-- CTA Button -->
+              <!-- CTA Button (Pill Gradient) -->
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
                 <tr>
-                  <td align="center" class="cta-btn-td" style="border-radius:8px; background-color:#F97316; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4); text-align:center;">
-                    <a href="${ctaUrl}" class="cta-btn" style="background-color:#F97316; border-top:16px solid #F97316; border-bottom:16px solid #F97316; border-left:36px solid #F97316; border-right:36px solid #F97316; color:#FFFFFF; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:18px; font-weight:800; text-decoration:none; border-radius:8px; display:inline-block; letter-spacing:0.5px; text-transform:uppercase; text-align:center; line-height:1;">
+                  <td align="center" class="cta-btn-td" style="border-radius:999px; background-color:#f0c63c; box-shadow: 0 4px 18px rgba(216,154,18,0.4); text-align:center;">
+                    <a href="${ctaUrl}" class="cta-btn" style="background: linear-gradient(135deg,#fff0ad,#f0c63c,#d89a12); border-top:16px solid #f0c63c; border-bottom:16px solid #f0c63c; border-left:42px solid #f0c63c; border-right:42px solid #f0c63c; color:#2a1c08; font-family:Inter,Arial,sans-serif; font-size:18px; font-weight:900; text-decoration:none; border-radius:999px; display:inline-block; letter-spacing:0.5px; text-transform:uppercase; text-align:center; line-height:1;">
                       ${ctaText} &nbsp;➔
                     </a>
                   </td>
                 </tr>
               </table>
 
-              <p style="margin:0; color:#64748B; font-size:13px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0; color:#857564; font-size:13px; font-family:Inter,Arial,sans-serif;">
                 ✓ Satisfaction guaranteed &nbsp;·&nbsp; ✓ Bonuses included &nbsp;·&nbsp; ✓ Free delivery
               </p>
             </td>
@@ -497,25 +502,39 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
 
           <!-- ===== FINAL CLOSE ===== -->
           <tr>
-            <td class="mobile-pad" style="padding: 32px 40px; background-color:#FFFFFF; text-align:center; border-top:1px solid #E5E7EB;">
-              <p style="margin:0 0 16px; color:#374151; font-size:15px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+            <td class="mobile-pad" style="padding: 36px 40px; background-color:#FFFFFF; text-align:center; border-top:1px solid rgba(214,180,93,.2);">
+              <p style="margin:0 0 16px; color:#4c4031; font-size:15px; line-height:1.8; font-family:Inter,Arial,sans-serif;">
                 Here's the truth, {{firstName}}: the ${productName} won't stop power outages from happening. But it will make them completely irrelevant to your life. That's the goal.
               </p>
-              <p style="margin:0; color:#374151; font-size:15px; line-height:1.8; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0 0 24px; color:#4c4031; font-size:15px; line-height:1.8; font-family:Inter,Arial,sans-serif; font-weight:900;">
                 — ${senderName}
               </p>
+
+              <!-- Sharing Incentives Paragraph -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color:#fbf5ea; border-radius:16px; border:1px dashed rgba(214,180,93,.4);">
+                <tr>
+                  <td style="padding:20px 24px; text-align:left;">
+                    <p style="margin:0; color:#21190f; font-size:14px; font-weight:900; font-family:Inter,Arial,sans-serif; margin-bottom:6px;">
+                      📢 Know someone else battling NEPA blackouts?
+                    </p>
+                    <p style="margin:0; color:#65553f; font-size:13.5px; line-height:1.7; font-family:Inter,Arial,sans-serif;">
+                      If you forward this email to a friend, colleague, or family member who has been looking for a permanent backup power solution, and they make a purchase, we'll send you a special cash incentive (or direct store credit) as our way of saying thank you! Just have them mention your name or email address when placing their order.
+                    </p>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
 
           <!-- ===== FOOTER ===== -->
           <tr>
-            <td style="padding: 24px 32px; background-color:#F8FAFC; border-top:1px solid #E5E7EB; text-align:center;">
-              <p style="margin:0 0 8px; color:#6B7280; font-size:13px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+            <td style="padding: 28px 32px; background-color:#fbf5ea; border-top:1px solid rgba(214,180,93,.2); text-align:center;">
+              <p style="margin:0 0 8px; color:#65553f; font-size:13px; font-family:Inter,Arial,sans-serif;">
                 Questions? Reach us via ${supportContact}
               </p>
-              <p style="margin:0; color:#9CA3AF; font-size:12px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0; color:#857564; font-size:12px; font-family:Inter,Arial,sans-serif; line-height:1.6;">
                 You're receiving this because you signed up for updates from ${senderName}.<br>
-                <a href="#" style="color:#9CA3AF; text-decoration:underline;">Unsubscribe</a>
+                <a href="#" style="color:#857564; text-decoration:underline;">Unsubscribe</a>
               </p>
             </td>
           </tr>
@@ -529,8 +548,7 @@ export function generatePromoEmailHTML(config: PromoProductConfig): string {
   <!-- END OUTER WRAPPER -->
 
 </body>
-</html>
-  `.trim();
+</html>`.trim();
 }
 
 export const ecoflowRiver2ProConfig: PromoProductConfig = {
@@ -538,10 +556,10 @@ export const ecoflowRiver2ProConfig: PromoProductConfig = {
   tagline: 'Portable Power Station',
   priceDisplay: '₦618,500',
   originalPriceDisplay: '₦706,500+ if purchased separately',
-  ctaUrl: 'https://vissmingles.com/redirect?destination=stores.starprince.dev',
+  ctaUrl: '{{ctaUrl:ecoflow-river-2-pro}}',
   ctaText: 'Secure My Blackout-Proof Package',
-  supportContact: 'WhatsApp support',
-  senderName: 'Prince',
+  supportContact: '{{supportContact}}',
+  senderName: '{{senderName}}',
   urgencyText: 'This offer — including the free bonuses — closes once stock runs out',
   limitedUnits: 10,
   deadlineText: 'Sunday midnight',
@@ -597,10 +615,10 @@ export const hithiumEssSolarGeneratorConfig: PromoProductConfig = {
   tagline: 'Portable Power Bank Station',
   priceDisplay: '₦465,562',
   originalPriceDisplay: '₦572,000 if purchased separately',
-  ctaUrl: 'https://vissmingles.com/redirect?destination=https://marketplace.starprince.dev/details/product_id_115741_',
+  ctaUrl: '{{ctaUrl:hithium-ess-solar-generator}}',
   ctaText: 'Secure My Blackout-Proof Package',
-  supportContact: 'WhatsApp support',
-  senderName: 'Prince',
+  supportContact: '{{supportContact}}',
+  senderName: '{{senderName}}',
   urgencyText: 'This offer — including the free bonuses — closes once stock runs out',
   limitedUnits: 10,
   deadlineText: 'Sunday midnight',
@@ -646,7 +664,7 @@ export const hithiumEssSolarGeneratorTemplate: EmailTemplate = {
   id: 'hithium-ess-solar-generator-314ah',
   name: 'Hithium ESS Solar Generator 314Ah — Grand Slam Offer',
   category: 'Marketing',
-  subject: "NEPA can't touch you anymore — here's how",
+  subject: "NEPA Showed Me Shege This Month — Not Until I Found This!",
   preheader: "The next blackout won't disrupt a single minute of your life. Here's everything included.",
   body: generatePromoEmailHTML(hithiumEssSolarGeneratorConfig),
 };

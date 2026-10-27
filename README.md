@@ -21,7 +21,7 @@ A production-ready email client application built with Next.js 16, TypeScript, a
 - ✅ **Form Validation** - Robust email and input validation with Zod
 - 🎨 **Modern UI** - Beautiful interface with Tailwind CSS and Radix UI
 - 📱 **Responsive Design** - Works seamlessly on desktop and mobile
-- 🌙 **Dark Mode** - Automatic dark mode support
+- 🌙 **Theme Switcher** - Light, dark, or system theme (sidebar footer or Settings)
 - 🔔 **Toast Notifications** - User-friendly success and error messages
 - ⚡ **Performance** - Optimized with Next.js 16 and React 19
 
@@ -40,13 +40,17 @@ A production-ready email client application built with Next.js 16, TypeScript, a
    bun install
    ```
 
-2. **Configure Environment**
-   
-   Create `.env.local`:
-   ```env
-   RESEND_API_KEY=re_your_api_key_here
-   FROM_EMAIL=your-email@yourdomain.com
+2. **Configure the app**
+   ```bash
+   npm run setup
    ```
+   This walks you through a few prompts and creates `app.config.json` —
+   the file the app reads all secrets and settings from at runtime.
+   It is gitignored, so your keys never enter version control.
+
+   Prefer plain env vars? Copy `env.example.txt` to `.env.local` and fill
+   it in — environment variables are used as a fallback when
+   `app.config.json` is missing or a field is empty.
 
 3. **Run Development Server**
    ```bash
@@ -68,8 +72,15 @@ For detailed setup instructions, see [SETUP.md](SETUP.md).
 1. Go to [resend.com](https://resend.com) and create an account
 2. Navigate to **API Keys** → **Create API Key**
 3. Copy your API key
-4. In the app, click **Settings** and paste your API key
+4. Run `npm run setup` and paste it when prompted
+   (or click **Settings** in the app and paste it there — the key is
+   stored in your browser only)
 5. Click **Save & Validate**
+
+> **Sending domain:** the `fromEmail` you configure must belong to a
+> domain verified in Resend (Resend → **Domains** → add DNS records).
+> There are no hardcoded sender addresses — everything comes from
+> `app.config.json` or env vars.
 
 ### Sending Your First Email
 
@@ -82,10 +93,16 @@ For detailed setup instructions, see [SETUP.md](SETUP.md).
 ## 🏗️ Project Structure
 
 ```
-starprince-email-client/
+email-client/
+├── app.config.example.json     # Template for app.config.json (run `npm run setup`)
+├── scripts/
+│   └── setup.mjs               # Interactive config initializer
 ├── app/
 │   ├── api/
 │   │   ├── send-email/        # Email sending endpoint
+│   │   ├── send-bulk-email/   # Bulk sending endpoint
+│   │   ├── config/            # Public (non-secret) config for the client
+│   │   ├── check-env-key/     # API key presence check
 │   │   └── validate-api-key/  # API key validation
 │   ├── layout.tsx              # Root layout with metadata
 │   └── page.tsx                # Main application page
@@ -100,7 +117,8 @@ starprince-email-client/
 │   │   └── sidebar.tsx        # Navigation sidebar
 │   └── ui/                    # Reusable UI components
 ├── lib/
-│   ├── templates.ts           # Email templates
+│   ├── config.ts              # Runtime config loader (app.config.json → env fallback)
+│   ├── templates.ts           # Email templates + {{var}} resolver
 │   ├── types.ts               # TypeScript definitions
 │   ├── utils.ts               # Utility functions
 │   └── validation.ts          # Zod schemas
@@ -205,8 +223,13 @@ Five pre-built templates included:
 2. Import project in Vercel
 3. Add environment variables:
    - `RESEND_API_KEY`
-   - `FROM_EMAIL`
+   - `FROM_EMAIL` (e.g. `Name <mailer@yourdomain.com>`)
+   - `ADMIN_EMAIL` (optional)
+   - `TEMPLATE_VARS` (optional JSON map, e.g. `{"senderName":"Acme"}`)
 4. Deploy!
+
+`app.config.json` doesn't exist in deployments (it's gitignored), so the
+app automatically falls back to these environment variables.
 
 ### Other Platforms
 

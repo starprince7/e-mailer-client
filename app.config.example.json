@@ -1,0 +1,14 @@
+{
+  "resendApiKey": "",
+  "fromEmail": "mailer@example.com",
+  "fromName": "Sender",
+  "adminEmail": "",
+  "rateLimitMax": 10,
+  "rateLimitWindowMs": 60000,
+  "templateVars": {
+    "senderName": "Sender",
+    "supportContact": "support",
+    "ctaUrl:ecoflow-river-2-pro": "https://example.com/products/a",
+    "ctaUrl:hithium-ess-solar-generator": "https://example.com/products/b"
+  }
+}

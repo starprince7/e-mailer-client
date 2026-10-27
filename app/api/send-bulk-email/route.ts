@@ -1,24 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { getConfig } from '@/lib/config';
+import { resolveTemplateVars } from '@/lib/templates';
 
 const rateLimit = new Map<string, { count: number; resetTime: number }>();
 
-const RATE_LIMIT_MAX = 10;
-const RATE_LIMIT_WINDOW = 60 * 1000;
-
-function checkRateLimit(identifier: string): boolean {
+function checkRateLimit(identifier: string, max: number, windowMs: number): boolean {
   const now = Date.now();
   const userLimit = rateLimit.get(identifier);
 
   if (!userLimit || now > userLimit.resetTime) {
     rateLimit.set(identifier, {
       count: 1,
-      resetTime: now + RATE_LIMIT_WINDOW,
+      resetTime: now + windowMs,
     });
     return true;
   }
 
-  if (userLimit.count >= RATE_LIMIT_MAX) {
+  if (userLimit.count >= max) {
     return false;
   }
 
@@ -40,7 +39,8 @@ function replacePlaceholders(text: string, firstName: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = request.headers.get('x-api-key') || process.env.RESEND_API_KEY;
+    const config = getConfig();
+    const apiKey = request.headers.get('x-api-key') || config.resendApiKey;
 
     if (!apiKey) {
       return NextResponse.json(
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
 
     const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
 
-    if (!checkRateLimit(clientIp)) {
+    if (!checkRateLimit(clientIp, config.rateLimitMax, config.rateLimitWindowMs)) {
       return NextResponse.json(
         { error: 'Rate limit exceeded. Please try again later.' },
         { status: 429 }
@@ -82,19 +82,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!fromTitle || typeof fromTitle !== 'string') {
+    const resolvedFromTitle =
+      typeof fromTitle === 'string' && fromTitle.trim() ? fromTitle : config.fromName;
+    const resolvedFromEmail =
+      typeof fromEmail === 'string' && fromEmail.trim() ? fromEmail : config.fromEmail;
+
+    if (!resolvedFromEmail) {
       return NextResponse.json(
-        { error: 'From title is required' },
-        { status: 400 }
+        { error: 'Sender address is not configured. Set "fromEmail" in app.config.json or the FROM_EMAIL environment variable.' },
+        { status: 500 }
       );
     }
 
-    if (!fromEmail || typeof fromEmail !== 'string') {
-      return NextResponse.json(
-        { error: 'From email is required' },
-        { status: 400 }
-      );
-    }
+    const resolvedSubject = resolveTemplateVars(subject, config.templateVars);
+    const resolvedBody = resolveTemplateVars(emailBody, config.templateVars);
 
     const resend = new Resend(apiKey);
     const errors: { email: string; error: string }[] = [];
@@ -123,12 +124,12 @@ export async function POST(request: NextRequest) {
       }
 
       const firstName = extractFirstName(recipient.name);
-      const personalizedSubject = replacePlaceholders(subject, firstName);
-      const personalizedBody = replacePlaceholders(emailBody, firstName);
+      const personalizedSubject = replacePlaceholders(resolvedSubject, firstName);
+      const personalizedBody = replacePlaceholders(resolvedBody, firstName);
 
       try {
         const response = await resend.emails.send({
-          from: `${fromTitle} <${fromEmail}>`,
+          from: `${resolvedFromTitle} <${resolvedFromEmail}>`,
           to: [email.trim()],
           subject: personalizedSubject,
           html: personalizedBody,

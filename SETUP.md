@@ -24,12 +24,19 @@ This guide will help you set up and configure the email client application with 
 
 2. **Environment Configuration**
 
-   Create a `.env.local` file in the root directory:
+   Run the interactive setup script:
    ```bash
-   cp env.example.txt .env.local
+   npm run setup
    ```
 
-   Update the values in `.env.local`:
+   It prompts for your Resend API key and sender address, then writes
+   `app.config.json` — the file the app reads all secrets and settings
+   from at runtime. The file is gitignored, so secrets stay local.
+
+   **Fallback:** if `app.config.json` doesn't exist (e.g. on a hosting
+   platform), the app reads plain environment variables instead —
+   copy `env.example.txt` to `.env.local` or set them in your host's
+   dashboard:
    ```env
    RESEND_API_KEY=re_your_actual_api_key_here
    FROM_EMAIL=your-email@yourdomain.com
@@ -43,7 +50,7 @@ This guide will help you set up and configure the email client application with 
 4. Give it a name (e.g., "Email Client")
 5. Select permissions: **Send emails**
 6. Copy the generated API key
-7. Paste it in your `.env.local` file
+7. Paste it when `npm run setup` prompts for it (it lands in `app.config.json`)
 
 ## Domain Verification
 
@@ -93,20 +100,24 @@ You can use Resend's test domain `onboarding@resend.dev` to send test emails:
 
 ### Email Templates
 
-Pre-built templates are available:
-- Welcome Email
-- Meeting Invitation
-- Newsletter
-- Thank You
-- Follow-up
+Pre-built templates are available in the template dropdown (defined in
+`lib/templates/`). Selecting one auto-fills the subject and body — you
+can edit both before sending. `{{variables}}` in templates are filled
+from `templateVars` in `app.config.json`.
 
 Select a template from the dropdown to auto-fill subject and body.
 
-### Viewing Emails
+### Bulk Sending
 
-- **Inbox**: Demo emails (for demonstration)
-- **Sent**: Shows sent emails (mock data for now)
-- Click any email to view details
+- Click **Bulk Send** in the sidebar
+- Paste a JSON array of recipients (each with at least an `email` field)
+- Use `{{firstName}}` in subject/body for per-recipient personalization
+- Template `{{variables}}` are resolved from `templateVars` in `app.config.json`
+
+### Appearance
+
+- Use the theme switcher in the sidebar footer (or Settings → Appearance)
+  to pick light, dark, or system theme
 
 ## Features
 
@@ -190,7 +201,7 @@ Validate a Resend API key.
 
 ### "Rate limit exceeded" Error
 - Wait 60 seconds before sending more emails
-- Adjust `RATE_LIMIT_MAX` in `.env.local` if needed
+- Adjust `rateLimitMax` in `app.config.json` (or `RATE_LIMIT_MAX` env var) if needed
 
 ### Emails Not Sending
 - Verify your API key is correct

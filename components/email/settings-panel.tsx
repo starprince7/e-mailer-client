@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { Key, Save, Eye, EyeOff } from 'lucide-react';
+import { ThemeSwitcher } from '@/components/theme-switcher';
+import { API_KEY_UPDATED_EVENT } from '@/components/api-key-banner';
+import { Key, Save, Eye, EyeOff, Palette } from 'lucide-react';
 
 export function SettingsPanel() {
   const [apiKey, setApiKey] = useState('');
@@ -56,7 +58,8 @@ export function SettingsPanel() {
       }
 
       localStorage.setItem('resend_api_key', apiKey);
-      
+      window.dispatchEvent(new Event(API_KEY_UPDATED_EVENT));
+
       toast({
         title: 'API Key Saved',
         description: 'Your Resend API key has been validated and saved successfully.',
@@ -75,6 +78,7 @@ export function SettingsPanel() {
   const handleClear = () => {
     setApiKey('');
     localStorage.removeItem('resend_api_key');
+    window.dispatchEvent(new Event(API_KEY_UPDATED_EVENT));
     toast({
       title: 'API Key Cleared',
       description: 'Your API key has been removed from local storage.',
@@ -141,6 +145,19 @@ export function SettingsPanel() {
           </div>
 
           <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800">
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4 flex items-center gap-2">
+              <Palette className="h-5 w-5" />
+              Appearance
+            </h3>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Choose light, dark, or follow your system preference.
+              </p>
+              <ThemeSwitcher />
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800">
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
               How to get your API Key
             </h3>
@@ -157,9 +174,11 @@ export function SettingsPanel() {
               Security Notice
             </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              This application stores your API key in browser local storage for convenience. 
-              For production use, consider implementing server-side authentication and storing 
-              API keys in environment variables.
+              A key saved here is stored in your browser&apos;s local storage and sent with each
+              request. It is always used for sends from this browser — it takes precedence over
+              the server-side <code className="font-mono">resendApiKey</code> in
+              <code className="font-mono"> app.config.json</code> or the <code className="font-mono">RESEND_API_KEY</code> environment
+              variable.
             </p>
           </div>
         </div>
