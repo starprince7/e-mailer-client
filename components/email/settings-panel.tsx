@@ -6,19 +6,56 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { ThemeSwitcher } from '@/components/theme-switcher';
 import { API_KEY_UPDATED_EVENT } from '@/components/api-key-banner';
-import { Key, Save, Eye, EyeOff, Palette } from 'lucide-react';
+import { Key, Save, Eye, EyeOff, Palette, Mail, Loader2 } from 'lucide-react';
 
 export function SettingsPanel() {
   const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [fromName, setFromName] = useState('');
+  const [fromLocalPart, setFromLocalPart] = useState('');
+  const [fromDomain, setFromDomain] = useState('');
+  const [verifiedDomains, setVerifiedDomains] = useState<string[]>([]);
+  const [domainsLoading, setDomainsLoading] = useState(false);
   const { toast } = useToast();
+
+  const fetchVerifiedDomains = async (key: string) => {
+    setDomainsLoading(true);
+    try {
+      const response = await fetch('/api/domains', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: key }),
+      });
+      const data = await response.json();
+      if (response.ok && Array.isArray(data.domains)) {
+        const verified = data.domains
+          .filter((d: { status: string }) => d.status === 'verified')
+          .map((d: { name: string }) => d.name);
+        setVerifiedDomains(verified);
+        setFromDomain((prev) => (verified.includes(prev) ? prev : verified[0] ?? ''));
+      }
+    } catch {
+      // Domain list is a convenience — manual entry still works without it.
+    } finally {
+      setDomainsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const savedKey = localStorage.getItem('resend_api_key');
     if (savedKey) {
       setApiKey(savedKey);
+      fetchVerifiedDomains(savedKey);
     }
+
+    const savedFrom = localStorage.getItem('resend_from_email') ?? '';
+    const atIndex = savedFrom.lastIndexOf('@');
+    if (atIndex > 0) {
+      setFromLocalPart(savedFrom.slice(0, atIndex));
+      setFromDomain(savedFrom.slice(atIndex + 1));
+    }
+    setFromName(localStorage.getItem('resend_from_name') ?? '');
   }, []);
 
   const handleSave = async () => {
@@ -58,11 +95,29 @@ export function SettingsPanel() {
       }
 
       localStorage.setItem('resend_api_key', apiKey);
+
+      const fromEmail = fromLocalPart.trim() && fromDomain.trim()
+        ? `${fromLocalPart.trim()}@${fromDomain.trim()}`
+        : '';
+      if (fromEmail) {
+        localStorage.setItem('resend_from_email', fromEmail);
+      } else {
+        localStorage.removeItem('resend_from_email');
+      }
+      if (fromName.trim()) {
+        localStorage.setItem('resend_from_name', fromName.trim());
+      } else {
+        localStorage.removeItem('resend_from_name');
+      }
+
       window.dispatchEvent(new Event(API_KEY_UPDATED_EVENT));
+      fetchVerifiedDomains(apiKey);
 
       toast({
-        title: 'API Key Saved',
-        description: 'Your Resend API key has been validated and saved successfully.',
+        title: 'Settings Saved',
+        description: fromEmail
+          ? `Ready to send as ${fromName.trim() || fromEmail} <${fromEmail}>.`
+          : 'Your Resend API key has been validated and saved successfully.',
       });
     } catch (error) {
       toast({
@@ -77,7 +132,13 @@ export function SettingsPanel() {
 
   const handleClear = () => {
     setApiKey('');
+    setFromName('');
+    setFromLocalPart('');
+    setFromDomain('');
+    setVerifiedDomains([]);
     localStorage.removeItem('resend_api_key');
+    localStorage.removeItem('resend_from_email');
+    localStorage.removeItem('resend_from_name');
     window.dispatchEvent(new Event(API_KEY_UPDATED_EVENT));
     toast({
       title: 'API Key Cleared',
@@ -140,6 +201,80 @@ export function SettingsPanel() {
                 <Button variant="outline" onClick={handleClear}>
                   Clear
                 </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800">
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4 flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              Sender Address
+            </h3>
+            <div className="space-y-4">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Emails you send will come from this address. It must be on a domain verified in
+                your Resend account — save your API key first and we&apos;ll list your verified
+                domains for you.
+              </p>
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                  Sender Name (shown to recipients)
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Jane Doe"
+                  value={fromName}
+                  onChange={(e) => setFromName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                  Sender Email
+                </label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    placeholder="hello"
+                    value={fromLocalPart}
+                    onChange={(e) => setFromLocalPart(e.target.value)}
+                    className="flex-1"
+                  />
+                  <span className="text-zinc-500 dark:text-zinc-400">@</span>
+                  {domainsLoading ? (
+                    <div className="flex-1 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Checking your domains...
+                    </div>
+                  ) : verifiedDomains.length > 0 ? (
+                    <select
+                      value={fromDomain}
+                      onChange={(e) => setFromDomain(e.target.value)}
+                      className="flex-1 h-10 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                    >
+                      {verifiedDomains.map((domain) => (
+                        <option key={domain} value={domain}>{domain}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <Input
+                      type="text"
+                      placeholder="yourdomain.com"
+                      value={fromDomain}
+                      onChange={(e) => setFromDomain(e.target.value)}
+                      className="flex-1"
+                    />
+                  )}
+                </div>
+                {verifiedDomains.length === 0 && apiKey && !domainsLoading && (
+                  <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                    No verified domains found on this key yet — verify one in Resend → Domains, then save again.
+                  </p>
+                )}
+                {fromLocalPart.trim() && fromDomain.trim() && (
+                  <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                    Sending as: <span className="font-medium text-zinc-900 dark:text-zinc-50">{fromName.trim() || fromLocalPart.trim()} &lt;{fromLocalPart.trim()}@{fromDomain.trim()}&gt;</span>
+                  </p>
+                )}
               </div>
             </div>
           </div>

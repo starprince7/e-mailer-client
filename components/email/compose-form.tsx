@@ -40,7 +40,11 @@ export function ComposeForm({ onSuccess, onOpenSettings }: ComposeFormProps) {
       try {
         const response = await fetch('/api/config');
         const data = await response.json();
-        if (data.fromName) {
+        const savedName = localStorage.getItem('resend_from_name');
+        if (savedName) {
+          setDefaultFromName(savedName);
+          setFromTitle((prev) => prev || savedName);
+        } else if (data.fromName) {
           setDefaultFromName(data.fromName);
           setFromTitle((prev) => prev || data.fromName);
         }
@@ -135,6 +139,8 @@ export function ComposeForm({ onSuccess, onOpenSettings }: ComposeFormProps) {
       formData.append('body', body);
       formData.append('html', body);
       formData.append('fromTitle', fromTitle);
+      const savedFromEmail = localStorage.getItem('resend_from_email');
+      if (savedFromEmail) formData.append('fromEmail', savedFromEmail);
 
       attachments.forEach((file) => {
         formData.append('attachments', file);

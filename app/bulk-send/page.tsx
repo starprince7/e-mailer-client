@@ -95,8 +95,18 @@ export default function BulkSendPage() {
       try {
         const response = await fetch('/api/config');
         const data = await response.json();
-        if (data.fromName) setFromTitle((prev) => prev || data.fromName);
-        if (data.fromEmail) setFromEmail((prev) => prev || data.fromEmail);
+        const savedFromEmail = localStorage.getItem('resend_from_email');
+        const savedFromName = localStorage.getItem('resend_from_name');
+        if (savedFromName) {
+          setFromTitle((prev) => prev || savedFromName);
+        } else if (data.fromName) {
+          setFromTitle((prev) => prev || data.fromName);
+        }
+        if (savedFromEmail) {
+          setFromEmail((prev) => prev || savedFromEmail);
+        } else if (data.fromEmail) {
+          setFromEmail((prev) => prev || data.fromEmail);
+        }
         if (data.templateVars) setTemplateVars(data.templateVars);
       } catch (error) {
         console.error('Failed to load app config:', error);

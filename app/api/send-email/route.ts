@@ -78,16 +78,17 @@ export async function POST(request: NextRequest) {
     const ccEmails = cc ? cc.split(',').map(email => email.trim()) : undefined;
     const bccEmails = bcc ? bcc.split(',').map(email => email.trim()) : undefined;
 
-    if (!config.fromEmail) {
+    const fromEmail = (formData.get('fromEmail') as string | null) || config.fromEmail;
+    if (!fromEmail) {
       return NextResponse.json(
-        { error: 'Sender address is not configured. Set "fromEmail" in app.config.json or the FROM_EMAIL environment variable.' },
+        { error: 'Sender address is not configured. Set it in Settings, or set "fromEmail" in app.config.json / the FROM_EMAIL environment variable.' },
         { status: 500 }
       );
     }
 
     const fromTitle = formData.get('fromTitle') as string || config.fromName;
     const emailData: any = {
-      from: `${fromTitle} <${config.fromEmail}>`,
+      from: `${fromTitle} <${fromEmail}>`,
       to: toEmails,
       subject,
       html: html || `<p>${body.replace(/\n/g, '<br>')}</p>`,
