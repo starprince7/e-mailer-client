@@ -22,6 +22,7 @@ export function ComposeForm({ onSuccess, onOpenSettings }: ComposeFormProps) {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [fromTitle, setFromTitle] = useState('');
+  const [replyTo, setReplyTo] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showCc, setShowCc] = useState(false);
@@ -31,9 +32,17 @@ export function ComposeForm({ onSuccess, onOpenSettings }: ComposeFormProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [editorMode, setEditorMode] = useState<'rich' | 'html' | 'preview'>('rich');
   const [defaultFromName, setDefaultFromName] = useState('');
+  const [defaultReplyTo, setDefaultReplyTo] = useState('');
   const { toast } = useToast();
 
   const isHtmlTemplate = body.trimStart().toLowerCase().startsWith('<!doctype');
+
+  const replyToAddresses = replyTo.split(',').map((address) => address.trim()).filter(Boolean);
+  const replyToError =
+    replyToAddresses.length > 0 &&
+    !replyToAddresses.every((address) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address))
+      ? 'Use plain email addresses, comma-separated. Display names are not allowed here.'
+      : '';
 
   useEffect(() => {
     const loadAppConfig = async () => {
@@ -48,6 +57,11 @@ export function ComposeForm({ onSuccess, onOpenSettings }: ComposeFormProps) {
           setDefaultFromName(data.fromName);
           setFromTitle((prev) => prev || data.fromName);
         }
+        const initialReplyTo =
+          localStorage.getItem('resend_from_email') || data.fromEmail || '';
+        setDefaultReplyTo(initialReplyTo);
+        setReplyTo((prev) => prev || initialReplyTo);
+
         if (data.templateVars) setTemplateVars(data.templateVars);
       } catch (error) {
         console.error('Failed to load app config:', error);
@@ -135,6 +149,7 @@ export function ComposeForm({ onSuccess, onOpenSettings }: ComposeFormProps) {
       formData.append('to', to);
       if (cc) formData.append('cc', cc);
       if (bcc) formData.append('bcc', bcc);
+      if (replyTo.trim()) formData.append('replyTo', replyTo.trim());
       formData.append('subject', subject);
       formData.append('body', body);
       formData.append('html', body);
@@ -174,6 +189,7 @@ export function ComposeForm({ onSuccess, onOpenSettings }: ComposeFormProps) {
       setSubject('');
       setBody('');
       setFromTitle(defaultFromName);
+      setReplyTo(defaultReplyTo);
       setSelectedTemplate('');
       setEditorMode('rich');
       setAttachments([]);
@@ -288,6 +304,28 @@ export function ComposeForm({ onSuccess, onOpenSettings }: ComposeFormProps) {
               value={fromTitle}
               onChange={(e) => setFromTitle(e.target.value)}
             />
+          </div>
+
+          <div>
+            <label htmlFor="replyTo" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+              Reply-To (Optional)
+            </label>
+            <Input
+              id="replyTo"
+              type="text"
+              placeholder="replies@example.com"
+              value={replyTo}
+              onChange={(e) => setReplyTo(e.target.value)}
+            />
+            {replyToError ? (
+              <p role="status" className="mt-1 text-xs text-red-600 dark:text-red-400">
+                {replyToError}
+              </p>
+            ) : (
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                Replies go here instead of the sender address. Leave blank to send no Reply-To header.
+              </p>
+            )}
           </div>
 
           <Input
@@ -503,7 +541,7 @@ export function ComposeForm({ onSuccess, onOpenSettings }: ComposeFormProps) {
             </span>
           </label>
         </div>
-        <Button type="submit" disabled={isLoading || apiKeyStatus === 'missing' || apiKeyStatus === 'checking'}>
+        <Button type="submit" disabled={isLoading || apiKeyStatus === 'missing' || apiKeyStatus === 'checking' || !!replyToError}>
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { getConfig } from '@/lib/config';
 import { resolveTemplateVars } from '@/lib/templates';
+import { replyToSchema } from '@/lib/validation';
 
 const rateLimit = new Map<string, { count: number; resetTime: number }>();
 
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { recipients, subject, body: emailBody, fromTitle, fromEmail } = body;
+    const { recipients, subject, body: emailBody, fromTitle, fromEmail, replyTo } = body;
 
     if (!recipients || !Array.isArray(recipients)) {
       return NextResponse.json(
@@ -93,6 +94,19 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    const replyToCheck = replyToSchema.safeParse(replyTo);
+    if (!replyToCheck.success) {
+      return NextResponse.json(
+        { error: 'Invalid Reply-To address' },
+        { status: 400 }
+      );
+    }
+
+    const resolvedReplyTo =
+      typeof replyTo === 'string' && replyTo.trim()
+        ? replyTo.split(',').map((email) => email.trim()).filter(Boolean)
+        : undefined;
 
     const resolvedSubject = resolveTemplateVars(subject, config.templateVars);
     const resolvedBody = resolveTemplateVars(emailBody, config.templateVars);
@@ -133,6 +147,7 @@ export async function POST(request: NextRequest) {
           to: [email.trim()],
           subject: personalizedSubject,
           html: personalizedBody,
+          replyTo: resolvedReplyTo,
         });
 
         if (response.error) {

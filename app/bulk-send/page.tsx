@@ -30,6 +30,8 @@ const EXAMPLE_JSON = `[
   }
 ]`;
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 function StepHeader({ step, title, children }: { step: number; title: string; children?: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-200 dark:border-zinc-800">
@@ -50,6 +52,8 @@ export default function BulkSendPage() {
   const [recipientInputMessage, setRecipientInputMessage] = useState('');
   const [fromTitle, setFromTitle] = useState('');
   const [fromEmail, setFromEmail] = useState('');
+  const [replyTo, setReplyTo] = useState('');
+  const [replyToTouched, setReplyToTouched] = useState(false);
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
@@ -63,6 +67,13 @@ export default function BulkSendPage() {
   const isHtmlTemplate = body.trimStart().toLowerCase().startsWith('<!doctype');
   const validCount = parsedRecipients.filter(r => r.valid).length;
   const invalidCount = parsedRecipients.length - validCount;
+
+  const replyToAddresses = replyTo.split(',').map((address) => address.trim()).filter(Boolean);
+  const replyToError =
+    replyToAddresses.length > 0 &&
+    !replyToAddresses.every((address) => EMAIL_PATTERN.test(address))
+      ? 'Use plain email addresses, comma-separated. Display names are not allowed here.'
+      : '';
 
   const handleTemplateSelect = (templateId: string) => {
     setSelectedTemplate(templateId);
@@ -102,11 +113,9 @@ export default function BulkSendPage() {
         } else if (data.fromName) {
           setFromTitle((prev) => prev || data.fromName);
         }
-        if (savedFromEmail) {
-          setFromEmail((prev) => prev || savedFromEmail);
-        } else if (data.fromEmail) {
-          setFromEmail((prev) => prev || data.fromEmail);
-        }
+        const initialFromEmail = savedFromEmail || data.fromEmail || '';
+        setFromEmail((prev) => prev || initialFromEmail);
+        setReplyTo((prev) => prev || initialFromEmail);
         if (data.templateVars) setTemplateVars(data.templateVars);
       } catch (error) {
         console.error('Failed to load app config:', error);
@@ -183,6 +192,15 @@ export default function BulkSendPage() {
       return;
     }
 
+    if (replyToError) {
+      toast({
+        title: 'Invalid Reply-To',
+        description: replyToError,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     // The browser-stored key is authoritative — use it when present
     const apiKey = localStorage.getItem('resend_api_key');
 
@@ -230,6 +248,7 @@ export default function BulkSendPage() {
           body,
           fromTitle,
           fromEmail,
+          replyTo,
         }),
       });
 
@@ -422,8 +441,34 @@ export default function BulkSendPage() {
                 type="email"
                 placeholder="mailer@example.com"
                 value={fromEmail}
-                onChange={(e) => setFromEmail(e.target.value)}
+                onChange={(e) => {
+                  setFromEmail(e.target.value);
+                  if (!replyToTouched) setReplyTo(e.target.value);
+                }}
               />
+            </div>
+            <div>
+              <label htmlFor="reply-to" className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Reply-To
+              </label>
+              <Input
+                id="reply-to"
+                type="text"
+                placeholder="replies@example.com"
+                value={replyTo}
+                onChange={(e) => {
+                  setReplyToTouched(true);
+                  setReplyTo(e.target.value);
+                }}
+              />
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                Replies go here instead of the From Email. Leave blank to send no Reply-To header.
+              </p>
+              {replyToError && (
+                <p role="status" className="mt-1 text-xs text-red-600 dark:text-red-400">
+                  {replyToError}
+                </p>
+              )}
             </div>
           </div>
         </section>
@@ -568,7 +613,7 @@ export default function BulkSendPage() {
           </div>
           <Button
             onClick={handleSend}
-            disabled={isLoading || apiKeyStatus === 'missing' || apiKeyStatus === 'checking' || validCount === 0}
+            disabled={isLoading || apiKeyStatus === 'missing' || apiKeyStatus === 'checking' || validCount === 0 || !!replyToError}
           >
             {isLoading ? (
               <>

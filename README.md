@@ -13,6 +13,7 @@ A production-ready email client application built with Next.js 16, TypeScript, a
 - ✍️ **Rich Text Editor** - Format your emails with a full-featured editor
 - 📎 **File Attachments** - Attach files up to 25MB total
 - 👥 **Multiple Recipients** - Send to multiple recipients with CC and BCC support
+- ↩️ **Reply-To Address** - Route replies to any inbox, separate from the sender address
 - 📋 **Email Templates** - Pre-built templates for common use cases
 - ⚙️ **Settings Panel** - Easy API key configuration with validation
 
@@ -158,7 +159,7 @@ email-client/
 
 **POST** `/api/send-email`
 
-Sends an email via Resend API with support for attachments, CC, and BCC.
+Sends an email via Resend API with support for attachments, CC, BCC, and an optional Reply-To.
 
 **Request:**
 ```typescript
@@ -166,6 +167,7 @@ FormData {
   to: string          // Required, comma-separated
   cc?: string         // Optional
   bcc?: string        // Optional
+  replyTo?: string    // Optional, comma-separated; blank sends no Reply-To header
   subject: string     // Required
   body: string        // Required
   html?: string       // Optional HTML version

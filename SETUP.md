@@ -93,6 +93,8 @@ You can use Resend's test domain `onboarding@resend.dev` to send test emails:
    - **To**: Required (comma-separated for multiple)
    - **CC**: Optional (click CC button to show)
    - **BCC**: Optional (click BCC button to show)
+   - **Reply-To**: Optional, prefilled with your sender address — set it to a real inbox if the
+     sender is a no-reply address. Blank sends no Reply-To header
 3. Enter subject and message
 4. Optionally use email templates
 5. Attach files if needed (max 25MB total)
@@ -111,6 +113,8 @@ Select a template from the dropdown to auto-fill subject and body.
 
 - Click **Bulk Send** in the sidebar
 - Paste a JSON array of recipients (each with at least an `email` field)
+- Set the **Reply-To** address in the Sender step — it applies to every message in the batch.
+  Leave it blank to send no Reply-To header
 - Use `{{firstName}}` in subject/body for per-recipient personalization
 - Template `{{variables}}` are resolved from `templateVars` in `app.config.json`
 
@@ -132,6 +136,7 @@ Select a template from the dropdown to auto-fill subject and body.
 - ✅ Rich text editor
 - ✅ File attachments
 - ✅ CC and BCC fields
+- ✅ Reply-To address on single and bulk sends
 - ✅ Email templates
 - ✅ HTML email support
 - ✅ Multiple recipients
@@ -155,6 +160,7 @@ FormData {
   to: string (comma-separated emails)
   cc?: string (optional)
   bcc?: string (optional)
+  replyTo?: string (optional, comma-separated; blank sends no Reply-To header)
   subject: string
   body: string
   html?: string

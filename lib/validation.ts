@@ -9,6 +9,15 @@ export const emailArraySchema = z.string().transform((str) => {
     .filter(email => email.length > 0);
 }).pipe(z.array(emailSchema));
 
+export const replyToSchema = z.string().optional().refine(
+  (val) => {
+    if (!val || val.trim() === '') return true;
+    const emails = val.split(',').map(e => e.trim()).filter(e => e);
+    return emails.every(email => z.string().email().safeParse(email).success);
+  },
+  { message: 'All Reply-To email addresses must be valid' }
+);
+
 export const sendEmailSchema = z.object({
   to: z.string().min(1, 'At least one recipient is required').refine(
     (val) => {
@@ -33,6 +42,7 @@ export const sendEmailSchema = z.object({
     },
     { message: 'All BCC email addresses must be valid' }
   ),
+  replyTo: replyToSchema,
   subject: z.string().min(1, 'Subject is required').max(200, 'Subject is too long'),
   body: z.string().min(1, 'Email body is required'),
   html: z.string().optional(),

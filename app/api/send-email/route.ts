@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
     const to = formData.get('to') as string;
     const cc = formData.get('cc') as string | null;
     const bcc = formData.get('bcc') as string | null;
+    const replyTo = formData.get('replyTo') as string | null;
     const subject = formData.get('subject') as string;
     const body = formData.get('body') as string;
     const html = formData.get('html') as string;
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
       to,
       cc: cc || undefined,
       bcc: bcc || undefined,
+      replyTo: replyTo || undefined,
       subject,
       body,
       html: html || undefined,
@@ -77,6 +79,7 @@ export async function POST(request: NextRequest) {
     const toEmails = to.split(',').map(email => email.trim());
     const ccEmails = cc ? cc.split(',').map(email => email.trim()) : undefined;
     const bccEmails = bcc ? bcc.split(',').map(email => email.trim()) : undefined;
+    const replyToEmails = replyTo ? replyTo.split(',').map(email => email.trim()).filter(Boolean) : undefined;
 
     const fromEmail = (formData.get('fromEmail') as string | null) || config.fromEmail;
     if (!fromEmail) {
@@ -100,6 +103,10 @@ export async function POST(request: NextRequest) {
 
     if (bccEmails && bccEmails.length > 0) {
       emailData.bcc = bccEmails;
+    }
+
+    if (replyToEmails && replyToEmails.length > 0) {
+      emailData.replyTo = replyToEmails;
     }
 
     const attachments = formData.getAll('attachments') as File[];
@@ -158,6 +165,7 @@ export async function POST(request: NextRequest) {
               <tr><td style="padding:6px 0;color:#555;"><strong>To</strong></td><td>${to}</td></tr>
               <tr><td style="padding:6px 0;color:#555;"><strong>CC</strong></td><td>${cc || '(none)'}</td></tr>
               <tr><td style="padding:6px 0;color:#555;"><strong>BCC</strong></td><td>${bcc || '(none)'}</td></tr>
+              <tr><td style="padding:6px 0;color:#555;"><strong>Reply-To</strong></td><td>${replyTo || '(none)'}</td></tr>
               <tr><td style="padding:6px 0;color:#555;"><strong>Subject</strong></td><td>${subject}</td></tr>
               <tr><td colspan="2"><hr style="border:none;border-top:1px solid #ddd;margin:10px 0;"></td></tr>
               <tr><td style="padding:6px 0;color:#555;vertical-align:top;"><strong>Attachments</strong></td><td><ul style="margin:0;padding-left:16px;">${attachmentList}</ul></td></tr>
